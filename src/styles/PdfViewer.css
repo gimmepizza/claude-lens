@@ -1,0 +1,217 @@
+.pdf-workspace {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* Toolbar */
+.pdf-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+}
+
+.pdf-toolbar__brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-right: 16px;
+  white-space: nowrap;
+}
+
+.pdf-toolbar__separator {
+  width: 1px;
+  height: 28px;
+  background: var(--color-border);
+}
+
+.pdf-toolbar__file-name {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.pdf-toolbar__tools {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.pdf-toolbar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
+
+.pdf-toolbar__btn:hover {
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+}
+
+.pdf-toolbar__btn--active {
+  background: var(--color-highlight);
+  color: var(--color-primary);
+}
+
+.pdf-toolbar__btn--active:hover {
+  background: var(--color-highlight);
+}
+
+.pdf-toolbar__page-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.pdf-toolbar__page-nav button {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.pdf-toolbar__page-nav button:hover {
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+}
+
+/* PDF Canvas Area */
+.pdf-canvas-area {
+  flex: 1;
+  margin-top: 56px;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+  background: var(--color-bg);
+}
+
+.pdf-page-container {
+  position: relative;
+  background: #fff;
+  box-shadow: var(--shadow-lg);
+  border-radius: 4px;
+}
+
+.pdf-page-container canvas {
+  display: block;
+}
+
+/* Annotation Overlay */
+.annotation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.annotation-overlay--active {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+.annotation-overlay--text-mode {
+  cursor: text;
+}
+
+/* Annotations */
+.annotation {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.annotation--highlight {
+  background: var(--color-annotation);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.annotation--highlight:hover {
+  background: rgba(255, 213, 79, 0.5);
+}
+
+.annotation--box {
+  border: 2px solid var(--color-primary);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.annotation--text-note {
+  width: 24px;
+  height: 24px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s;
+}
+
+.annotation--text-note:hover {
+  transform: scale(1.15);
+}
+
+/* Drop zone */
+.pdf-drop-zone {
+  flex: 1;
+  margin-top: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--color-text-muted);
+}
+
+.pdf-drop-zone__icon {
+  font-size: 64px;
+  opacity: 0.4;
+}
+
+.pdf-drop-zone__text {
+  font-size: 18px;
+}
+
+.pdf-drop-zone__btn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.pdf-drop-zone__btn:hover {
+  background: var(--color-primary-hover);
+}
