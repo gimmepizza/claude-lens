@@ -13,30 +13,90 @@ const GREETING = {
     "Hi! I'm your PDF markup assistant. I can help summarize pages, explain content, extract data, or answer questions about your document. How can I help?",
 };
 
-function generateResponse(userMsg, annotationCount, currentPage) {
+function describeAnnotations(annotations, currentPage) {
+  const pageAnns = annotations.filter((a) => a.page === currentPage);
+  const allAnns = annotations;
+
+  if (allAnns.length === 0) {
+    return 'No annotations have been made yet.';
+  }
+
+  const typeCounts = (list) => {
+    const counts = {};
+    list.forEach((a) => {
+      counts[a.type] = (counts[a.type] || 0) + 1;
+    });
+    return counts;
+  };
+
+  const formatCounts = (counts) =>
+    Object.entries(counts)
+      .map(([type, count]) => {
+        const label =
+          type === 'highlight'
+            ? 'highlight(s)'
+            : type === 'box'
+            ? 'rectangle(s)'
+            : 'note(s)';
+        return `${count} ${label}`;
+      })
+      .join(', ');
+
+  const pageCounts = typeCounts(pageAnns);
+  const allCounts = typeCounts(allAnns);
+
+  const notes = allAnns.filter((a) => a.type === 'note' && a.text);
+  const notesSummary =
+    notes.length > 0
+      ? '\n\nNotes:\n' +
+        notes
+          .map(
+            (n) =>
+              `- Page ${n.page}: "${n.text}" (at ${Math.round(n.x)}%, ${Math.round(n.y)}%)`
+          )
+          .join('\n')
+      : '';
+
+  let summary = `Current page ${currentPage}: ${pageAnns.length > 0 ? formatCounts(pageCounts) : 'no annotations'}.`;
+  if (allAnns.length !== pageAnns.length) {
+    summary += `\nAll pages: ${formatCounts(allCounts)} (${allAnns.length} total).`;
+  }
+  summary += notesSummary;
+
+  return summary;
+}
+
+function generateResponse(userMsg, annotations, currentPage) {
   const lower = userMsg.toLowerCase();
+  const annotationInfo = describeAnnotations(annotations, currentPage);
 
   if (lower.includes('summarize') || lower.includes('summary')) {
-    return `Here's a summary of page ${currentPage}: This page contains document content that could include text, figures, and data. You currently have ${annotationCount} annotation(s) on this page. For a detailed AI-powered summary, connect this assistant to a Claude API endpoint.`;
+    return `Here's a summary of page ${currentPage}: This page contains document content that could include text, figures, and data.\n\n**Your annotations:**\n${annotationInfo}\n\nFor a detailed AI-powered summary, connect this assistant to a Claude API endpoint.`;
   }
 
   if (lower.includes('key term') || lower.includes('keyword')) {
-    return `To extract key terms from page ${currentPage}, I would analyze the text content for frequently occurring domain-specific terminology. Connect to the Claude API for full extraction capabilities.`;
+    return `To extract key terms from page ${currentPage}, I would analyze the text content for frequently occurring domain-specific terminology.\n\n**Your annotations:**\n${annotationInfo}\n\nConnect to the Claude API for full extraction capabilities.`;
   }
 
-  if (lower.includes('annotation') || lower.includes('markup')) {
-    return `You currently have ${annotationCount} annotation(s). Annotations can be highlights (yellow overlay), rectangles (red borders), or pinned notes. Click any annotation to remove it, or use the toolbar to add new ones.`;
+  if (
+    lower.includes('annotation') ||
+    lower.includes('markup') ||
+    lower.includes('highlight') ||
+    lower.includes('rectangle') ||
+    lower.includes('note')
+  ) {
+    return `**Annotation details:**\n${annotationInfo}\n\nYou can add highlights (yellow overlay), rectangles (red borders), or pinned notes using the toolbar. Click any annotation to remove it.`;
   }
 
   if (lower.includes('table') || lower.includes('extract')) {
-    return `Table extraction requires analyzing the page layout to identify structured data regions. You can mark table areas using the rectangle tool, then I can help parse them. Full extraction is available via the Claude API.`;
+    return `Table extraction requires analyzing the page layout to identify structured data regions. You can mark table areas using the rectangle tool, then I can help parse them.\n\n**Your annotations:**\n${annotationInfo}\n\nFull extraction is available via the Claude API.`;
   }
 
   if (lower.includes('help') || lower.includes('how')) {
-    return `Here's what I can help with:\n\n- **Summarize**: Get a quick overview of the current page\n- **Key Terms**: Identify important terminology\n- **Annotations**: Review and manage your markups\n- **Extract**: Pull tables and structured data\n\nUse the toolbar to highlight, draw boxes, or add notes to the PDF.`;
+    return `Here's what I can help with:\n\n- **Summarize**: Get a quick overview of the current page\n- **Key Terms**: Identify important terminology\n- **Annotations**: Review and manage your markups\n- **Extract**: Pull tables and structured data\n\nUse the toolbar to highlight, draw boxes, or add notes to the PDF.\n\n**Current annotations:**\n${annotationInfo}`;
   }
 
-  return `I understand you're asking about "${userMsg}". I can assist with PDF analysis, annotation management, and content extraction. For full AI capabilities, connect this assistant to a Claude API endpoint. Is there something specific about your document I can help with?`;
+  return `I understand you're asking about "${userMsg}".\n\n**Your annotations:**\n${annotationInfo}\n\nI can assist with PDF analysis, annotation management, and content extraction. For full AI capabilities, connect this assistant to a Claude API endpoint.`;
 }
 
 export default function FloatingAssistant({ annotations, currentPage }) {
@@ -72,11 +132,7 @@ export default function FloatingAssistant({ annotations, currentPage }) {
 
       // Simulate assistant response delay
       setTimeout(() => {
-        const response = generateResponse(
-          text,
-          annotations.length,
-          currentPage
-        );
+        const response = generateResponse(text, annotations, currentPage);
         setMessages((prev) => [
           ...prev,
           { role: 'assistant', content: response },
@@ -84,7 +140,7 @@ export default function FloatingAssistant({ annotations, currentPage }) {
         setIsTyping(false);
       }, 800 + Math.random() * 600);
     },
-    [annotations.length, currentPage]
+    [annotations, currentPage]
   );
 
   const handleSubmit = (e) => {
