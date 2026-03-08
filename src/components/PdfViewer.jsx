@@ -75,9 +75,9 @@ export default function PdfViewer({
     >
       <canvas ref={canvasRef} />
       <AnnotationLayer
-        annotations={annotations}
+        annotations={annotations.filter((a) => a.page === currentPage)}
         activeTool={activeTool}
-        onAddAnnotation={onAddAnnotation}
+        onAddAnnotation={(ann) => onAddAnnotation({ ...ann, page: currentPage })}
         onRemoveAnnotation={onRemoveAnnotation}
         containerWidth={dimensions.width}
         containerHeight={dimensions.height}
