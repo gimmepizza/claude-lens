@@ -23,8 +23,9 @@ Over the following four decades, Kandel and his collaborators used a simple defe
 8. [Maintaining the Trace: CPEB and the Prion-Like Switch](#8-maintaining-the-trace-cpeb-and-the-prion-like-switch)
 9. [From Sea Slug to Mammal: How the Findings Generalized](#9-from-sea-slug-to-mammal-how-the-findings-generalized)
 10. [Limits of the Model: What a Snail Reflex Cannot Tell Us](#10-limits-of-the-model-what-a-snail-reflex-cannot-tell-us)
-11. [Summary](#11-summary)
-12. [Sources](#sources)
+11. [The Molecular Cast: A Quick Glossary](#11-the-molecular-cast-a-quick-glossary)
+12. [Summary](#12-summary)
+13. [Sources](#sources)
 
 ---
 
@@ -133,6 +134,10 @@ The change is **presynaptic and homosynaptic** (it occurs in the very pathway th
 
 A single training session of ~10 stimuli produces habituation lasting **minutes**. But **repeated sessions spaced over days** (e.g., four sessions of ten stimuli) produce habituation that persists for **weeks**. And here the first hint of the great dichotomy appears: long-term habituation is accompanied by a **structural change** — a *reduction* in the number of synaptic connections (active zones/varicosities) between sensory and motor neurons. Short-term habituation adjusts release probability at existing synapses; long-term habituation physically prunes the connection. Prolonged habituation also depends on **protein synthesis, protein phosphatase activity, and postsynaptic glutamate receptors**, showing it is not merely the passive decay of the sensitized state.
 
+### 4.3 Dishabituation Is Not Just "Un-Habituation"
+
+A subtle but historically important point: when a strong stimulus (tail shock) is applied to an animal whose reflex has been *habituated*, the reflex is **restored** — this is **dishabituation**. It is tempting to read dishabituation as the mechanical reversal of habituation, as if the shock simply "erased" the depression. Kandel's group showed it is nothing of the kind. **Dishabituation and sensitization are the same process** — the serotonin-driven **presynaptic facilitation** of §5 — superimposed on the synapse. In the habituated (depressed) synapse it *looks* like restoration; in a naïve synapse the identical process *looks* like sensitization above baseline. Facilitation and depression are **independent, superimposable** modifications of the same terminal, acting through different molecular routes (5-HT/cAMP/PKA enhancement versus reduced-release depression). Recognizing that a single facilitatory mechanism accounted for both dishabituation *and* sensitization was a key simplification that pointed the whole program toward the cAMP cascade.
+
 ---
 
 ## 5. Sensitization: Learning to Fear
@@ -192,6 +197,10 @@ Adenylyl cyclase thus behaves as a **molecular coincidence detector**: it reads 
 ### 6.2 A Hebbian, Postsynaptic Component Too
 
 Later work showed the story is not purely presynaptic. Conditioning also recruits a **postsynaptic, Hebbian, NMDA-receptor-dependent** form of potentiation in the motor neuron — strengthened when pre- and postsynaptic cells are active together — which then feeds back onto the presynaptic terminal via a **retrograde signal**. The two mechanisms are **required together and interact**. This matters enormously for §9: it means the *Aplysia* synapse uses the **same NMDA-receptor coincidence-detection logic** later found to underlie LTP in the mammalian hippocampus. The coincidence detector for the *content* of the association (which synapse) is the NMDA receptor; the coincidence detector for the *timing* is adenylyl cyclase. (Compare the mammalian NMDA-receptor coincidence detector in [`../docs/04-learning-and-memory.md`](../docs/04-learning-and-memory.md#82-ltp-induction-the-nmda-receptor-as-coincidence-detector).)
+
+### 6.3 Operant Conditioning, Too
+
+The reflexive gill withdrawal is *classical* (stimulus-driven) conditioning, but *Aplysia* also supports **operant conditioning**, in which the animal learns from the *consequences of its own behavior*. In a well-studied paradigm, gill withdrawal (or, in a related preparation, feeding behavior mediated by the buccal ganglion) is reinforced contingent on the animal's own action, and the probability of that action changes accordingly. Operant learning in *Aplysia* engages an overlapping but partly distinct molecular logic — again converging on **cAMP/PKA signaling** and, for the feeding circuit, dopamine as the reinforcement signal. That a single small animal can be pushed to demonstrate habituation, sensitization, *and* both major forms of associative conditioning is precisely what made it such an economical laboratory for the general principles of learning.
 
 ---
 
@@ -303,7 +312,27 @@ None of this diminishes the achievement. The correct reading is the one Kandel i
 
 ---
 
-## 11. Summary
+## 11. The Molecular Cast: A Quick Glossary
+
+| Player | What it is | Role in the Aplysia story |
+|---|---|---|
+| **Glutamate** | Excitatory neurotransmitter | Released by sensory neurons; its *amount* is what habituation and facilitation tune |
+| **Serotonin (5-HT)** | Neuromodulator | The sensitizing signal, released by facilitatory interneurons onto sensory terminals |
+| **Adenylyl cyclase** | Enzyme making cAMP | Timing **coincidence detector** in conditioning (Ca²⁺/calmodulin + 5-HT sensitive) |
+| **cAMP** | Second messenger | Rises with 5-HT; activates PKA |
+| **PKA** | cAMP-dependent protein kinase | Phosphorylates channels (short-term); translocates to nucleus (long-term) |
+| **PKC** | Protein kinase C | Parallel arm mobilizing vesicles; sustains intermediate-term memory |
+| **S-type K⁺ channel** | Potassium channel | Closed by PKA phosphorylation → spike broadening → more Ca²⁺ |
+| **MAPK / ERK** | Kinase cascade | Reinforces nuclear signaling; relieves CREB-2 repression |
+| **CREB-1** | Transcription activator | The **master switch** turning short-term into long-term memory |
+| **CREB-2** | Transcription repressor | Gate that must be *lifted* for long-term memory; its removal lowers the threshold |
+| **C/EBP** | Immediate-early transcription factor | CREB-1 target driving the long-term growth program |
+| **CPEB** | Local-translation regulator | Prion-like latch that **maintains** long-term facilitation at tagged synapses |
+| **NMDA receptor** | Glutamate receptor / coincidence detector | Postsynaptic, Hebbian component of conditioning (bridge to mammalian LTP) |
+
+---
+
+## 12. Summary
 
 - *Aplysia californica* offered ~20,000 large, individually identifiable neurons in a knowable circuit — the ideal substrate for reducing learning to events at a single, named synapse.
 - **Eric Kandel** used the **gill- and siphon-withdrawal reflex** to prove that learning changes synaptic strength, winning a share of the **2000 Nobel Prize**.

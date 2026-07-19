@@ -81,6 +81,17 @@ peripheral nerves, and how lesions localize. Educational, not medical advice.*
 loops, cross-sections, and taxonomies — used only where a diagram makes a mechanism
 or structure clearer.)*
 
+### Comparative neuroscience — the animal brains
+A companion layer of **18 deep-dives on the most-studied animal nervous systems** —
+the model organisms that built modern neuroscience (mouse, rat, macaque, cat, fly,
+worm, *Aplysia*, zebrafish) and the independently-evolved minds that show what a
+brain *else* can be (octopus, corvids, honeybee). See the
+**[comparative section →](animals/README.md)**, starting with its
+[Overview & Synthesis](animals/00-comparative-synthesis.md). Almost every
+foundational discovery in this collection — the action potential, the synaptic
+basis of memory, the visual cortex, place cells — was first made in one of these
+animals.
+
 ---
 
 ## The story these documents tell, in brief
