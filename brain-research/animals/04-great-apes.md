@@ -204,6 +204,10 @@ What is contested:
 
 The honest state of play: apes clearly have *some* implicit machinery for predicting others' behavior based on what those others have perceived, and 2016-era eye-tracking pushed this closer to false-belief territory than anyone expected. But whether this amounts to human-style, concept-driven theory of mind — or a powerful set of behavior-reading heuristics — is genuinely unresolved.
 
+### Natural communication: gestures in the wild
+
+The ape-language projects asked whether apes can be *taught* a human system. A quieter, arguably more revealing line of research asks what apes communicate *naturally*. Field studies (notably by Catherine Hobaiter and Richard Byrne) have catalogued a large repertoire of intentional **gestures** used by wild chimpanzees — dozens of distinct signals deployed flexibly to achieve specific goals (initiate travel, request grooming, invite play), with the signaler monitoring whether the recipient responds and persisting or elaborating if not. Many gestures appear broadly shared across chimpanzee populations, and some overlap with bonobo and human-infant gesturing. This natural gestural communication is *intentional* and *goal-directed* — hallmarks of genuine communication — even though it lacks the open-ended, recursive productivity of human language. It is a more solid foundation for thinking about language origins than the contested sign-language projects.
+
 ### Cooperation, fairness, and prosociality
 
 - Apes cooperate: chimpanzees recruit partners for joint tasks, coordinate in hunts, and can solve problems requiring two individuals to pull together.
@@ -339,6 +343,23 @@ The upshot: great ape cognition is a field where the *strength of evidence* vari
 ## 11. What apes tell us about what is — and isn't — uniquely human
 
 The comparative record supports a middle path between "humans are just clever apes" and "humans are categorically apart."
+
+### An evidence-strength scorecard
+
+Not all "apes can do X" claims stand on equal footing. A rough triage:
+
+| Claim | Strength of evidence | Notes |
+|---|---|---|
+| Tool use and regional tool cultures | Strong | Wild, replicated, socially transmitted |
+| Mirror self-recognition (chimp, bonobo, orangutan) | Strong | Robust mark-test data; gorillas an informative exception |
+| Tracking what others see/know | Strong | Well-replicated competitive paradigms |
+| Future-oriented planning | Moderate | Santino + controlled studies; interpretation debated |
+| Anticipating others' false beliefs | Moderate / contested | 2016 eye-tracking is suggestive; "behavior rule" reading unresolved |
+| Symbol learning and comprehension (Kanzi) | Moderate | Reference and comprehension solid; not generative grammar |
+| Cumulative "ratcheting" culture | Weak / emerging | Hints (Taï nut-cracking); far weaker than in humans |
+| Chimp memory superiority over humans (Ayumu) | Weak / contested | Training asymmetry; humans can match with practice |
+| Recursive, generative language | Not supported | The central failure of the ape-language projects |
+
 
 **Continuities — traits once thought uniquely human that apes clearly share (at least in kind):**
 
