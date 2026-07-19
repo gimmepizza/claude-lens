@@ -64,6 +64,20 @@ The program unfolded in logical stages over roughly forty years:
 
 In **2000**, Kandel received the **Nobel Prize in Physiology or Medicine** "for their discoveries concerning signal transduction in the nervous system," shared with **Arvid Carlsson** (dopamine) and **Paul Greengard** (dopamine and slow synaptic transmission / protein phosphorylation cascades). Kandel's specific contribution was the demonstration that **learning changes the strength of synapses**, that **short- and long-term memory use distinct molecular mechanisms**, and that **long-term memory requires gene expression and structural growth**. His later popular memoir, *In Search of Memory* (2006), narrates the intellectual arc.
 
+### 2.1 Landmark Experiments at a Glance
+
+| Era | Advance | Significance |
+|---|---|---|
+| Early 1960s | Kandel leaves the hippocampus for *Aplysia* | Strategic bet on the simple system |
+| Late 1960s | Circuit of the gill-withdrawal reflex mapped (with Kupfermann, Castellucci) | Identified sensory, motor, and interneurons |
+| 1970 | Habituation localized to homosynaptic depression | Behavior ↔ identified synapse, directly linked |
+| 1970s–80s | Sensitization traced to 5-HT → cAMP → PKA → K⁺-channel closure | First complete molecular chain for learning |
+| 1983 | Activity-dependent presynaptic facilitation (Hawkins et al.) | Cellular mechanism of classical conditioning |
+| Mid-1980s | Sensory-motor synapse reconstituted **in culture** | Two cells + serotonin = a learning "circuit" |
+| Late 1980s–90s | Long-term facilitation shown to need CREB and protein synthesis | Short→long memory is a transcriptional switch |
+| 1990s | New synaptic varicosities grow with long-term facilitation | Memory as anatomical, not just functional, change |
+| 2003–2010 | CPEB found to be prion-like and self-sustaining (Si, Kandel) | Candidate mechanism for memory *persistence* |
+
 ---
 
 ## 3. The Gill- and Siphon-Withdrawal Reflex as a Model System
