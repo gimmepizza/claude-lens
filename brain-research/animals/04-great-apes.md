@@ -300,6 +300,15 @@ Important corrections to the popular "language gene" story:
 
 FOXP2 is best understood as a component of the motor-and-learning substrate on which speech relies — not a switch that turns language on.
 
+### Other human-specific duplications: SRGAP2 and NOTCH2NL
+
+ARHGAP11B is not alone. Two further well-studied cases involve gene duplications specific to the human lineage:
+
+- **SRGAP2C**, a human-specific partial duplicate of *SRGAP2*, slows the maturation of cortical neurons and promotes a higher density of dendritic spines (synaptic connection points) — a "neoteny" effect that may lengthen the window for synapse formation and learning.
+- **NOTCH2NL** genes, human-specific duplications in the Notch signaling pathway, delay neural progenitor differentiation and thereby increase neuron production — again feeding cortical expansion, and sitting in a genomic region (1q21.1) linked to human microcephaly and macrocephaly.
+
+Together with ARHGAP11B, these illustrate a recurring evolutionary motif: **duplication of a developmental gene, followed by tweaks that prolong progenitor proliferation or synaptic plasticity**, yielding more neurons and more connections.
+
 ### Human accelerated regions (HARs)
 
 **Human accelerated regions (HARs)** are short stretches of DNA highly conserved across mammals — implying they matter — that suddenly accumulated many changes specifically in the human lineage after the split from chimpanzees. Most HARs are **non-coding regulatory elements** (enhancers), and many are active in **neurodevelopment**, tuning *when, where, and how strongly* neural genes are switched on.
