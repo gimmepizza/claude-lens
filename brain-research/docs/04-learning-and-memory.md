@@ -137,6 +137,18 @@ Any memory passes through three logically distinct stages, and a failure at any 
 
 3. **Retrieval** — accessing and reconstructing stored information. Retrieval is *cue-dependent* and *reconstructive*, not a faithful playback — it actively rebuilds the memory from partial traces, which makes it prone to distortion and to the influence of current context (encoding-specificity principle; context- and state-dependent memory). Critically, retrieval itself is not neutral: it can strengthen a memory (the *testing effect*) and can also render it temporarily unstable (see §10, reconsolidation).
 
+```mermaid
+flowchart LR
+    P[Experience] --> E[Encoding<br/>hippocampal binding<br/>of cortical features]
+    E --> SC[Synaptic consolidation<br/>minutes–hours<br/>protein synthesis]
+    SC --> SYS[Systems consolidation<br/>days–years<br/>hippocampus → neocortex]
+    SYS --> LTM[(Stable<br/>long-term memory)]
+    LTM --> R{Retrieval<br/>cue-dependent,<br/>reconstructive}
+    R --> O[Recollection /<br/>behavioral output]
+    R -.->|reactivation destabilizes trace| RC[Reconsolidation window<br/>labile, protein-<br/>synthesis-dependent]
+    RC -.->|restabilize / update| LTM
+```
+
 ---
 
 ## 5. Working Memory and the Prefrontal Cortex
@@ -300,7 +312,7 @@ Formalized by **B. F. Skinner** (1904–1990), building on Thorndike's *law of e
 
 Emotional arousal profoundly strengthens memory — we remember emotionally charged events better and longer than neutral ones. The **amygdala** (in the anterior medial temporal lobe) is the hub of this modulation, and its role has two facets:
 
-1. **The amygdala as the site of implicit emotional memory.** In **fear conditioning**, sensory information about the CS and the aversive US converges on the **lateral amygdala**, where NMDA-receptor-dependent LTP strengthens the CS→fear association. The **central amygdala** then drives the physiological and behavioral outputs of fear (freezing, autonomic arousal, hormone release) via the hypothalamus and brainstem. **Joseph LeDoux's** work mapped this circuit and showed a "low road" (thalamus→amygdala) for rapid, crude threat detection and a "high road" (thalamus→cortex→amygdala) for detailed appraisal. This emotional memory is *implicit* and can persist even when the hippocampus is damaged.
+1. **The amygdala as the site of implicit emotional memory.** In **fear conditioning**, sensory information about the CS and the aversive US converges on the **lateral amygdala**, where NMDA-receptor-dependent LTP strengthens the CS→fear association. The **central amygdala** then drives the physiological and behavioral outputs of fear (freezing, autonomic arousal, hormone release) via the hypothalamus and brainstem. **Joseph LeDoux's** work mapped this circuit and proposed a "low road" (thalamus→amygdala) for rapid, crude threat detection alongside a "high road" (thalamus→cortex→amygdala) for detailed appraisal. (The strong version of a direct subcortical "low road" dominating rapid threat responses — particularly in humans — is debated, and LeDoux himself has since stressed that *conscious* fear depends on cortical processing; the dual-route scheme is best read as an influential heuristic rather than settled anatomy.) This emotional memory is *implicit* and can persist even when the hippocampus is damaged.
 
 2. **The amygdala as a modulator of declarative memory (McGaugh).** Emotional arousal triggers release of **stress hormones** — adrenal **epinephrine** and **glucocorticoids (cortisol)** — and **noradrenaline** within the basolateral amygdala. The amygdala, in turn, **enhances consolidation** in the hippocampus and cortex, biasing them to store arousing events more strongly. This is why emotional memories are vivid and durable. The relationship follows an **inverted-U** (Yerkes–Dodson): moderate arousal enhances memory, but extreme stress can impair hippocampal function and fragment memory (relevant to traumatic amnesia and PTSD).
 

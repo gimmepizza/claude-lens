@@ -139,6 +139,39 @@ Cortisol is not solely a "stress hormone." It follows a strong **circadian rhyth
 
 The HPA axis is self-limiting through **negative feedback**. Rising cortisol acts back on the **pituitary** (suppressing ACTH) and the **hypothalamus** (suppressing CRH), and also on the **hippocampus**, which exerts inhibitory control over the PVN. This closed loop shuts off cortisol production once it has risen — the hormone turns off its own signal. Effective feedback is what allows the stress response to be **switched off** when the threat passes; its failure is a central feature of chronic stress and of disorders such as depression and PTSD, where the "off switch" becomes unreliable.
 
+### 3.4 The two axes at a glance
+
+The diagram below traces both waves from a common trigger — the fast SAM axis (seconds, adrenaline from the adrenal *medulla*) and the slow HPA axis (minutes, cortisol from the adrenal *cortex*) — and the cortisol negative-feedback loop that shuts the HPA axis off.
+
+```mermaid
+flowchart TD
+    T[Threat / stressor] --> AM[Amygdala]
+    AM --> HY[Hypothalamus]
+
+    subgraph SAM["SAM axis — fast, seconds"]
+        HY --> SNS[Sympathetic preganglionic neurons]
+        SNS --> MED[Adrenal medulla<br/>chromaffin cells]
+        MED --> EPI[Adrenaline + noradrenaline<br/>into blood]
+        SNS --> NE[Direct noradrenaline<br/>onto organs]
+    end
+
+    subgraph HPA["HPA axis — slow, minutes"]
+        HY --> CRH[PVN releases CRH + AVP]
+        CRH --> PIT[Anterior pituitary]
+        PIT --> ACTH[ACTH into blood]
+        ACTH --> COR[Adrenal cortex<br/>zona fasciculata]
+        COR --> CORT[Cortisol]
+    end
+
+    EPI --> MOB[Whole-body mobilization]
+    NE --> MOB
+    CORT --> MOB
+
+    CORT -. negative feedback .-> PIT
+    CORT -. negative feedback .-> CRH
+    CORT -. via hippocampus .-> HY
+```
+
 ---
 
 ## 4. Beyond Fight-or-Flight: Freeze, Fawn, and the Defense Cascade
@@ -168,12 +201,14 @@ The **amygdala** sits upstream, selecting the defensive mode and driving the app
 
 ### 5.1 The amygdala as threat detector
 
-The **amygdala** is an almond-shaped cluster of nuclei deep in each temporal lobe. It is the brain's central hub for detecting biologically significant stimuli — above all, threat — and for orchestrating fear responses. Two of its nuclei are especially important:
+The **amygdala** is an almond-shaped cluster of nuclei deep in each temporal lobe. It is a central hub for detecting biologically significant stimuli — above all, threat — and for orchestrating the *body's* defensive responses. Two of its nuclei are especially important:
 
 - The **basolateral complex (BLA)** receives sensory input and is where stimulus-danger associations are formed (fear learning).
 - The **central nucleus (CeA)** is the major *output* station, projecting to the hypothalamus (autonomic and endocrine responses), the PAG (defensive behavior), and brainstem arousal centers.
 
 Through these outputs, the amygdala can simultaneously trigger the SAM axis, the HPA axis, and defensive behavior — coordinating the whole-body response described above.
+
+> **The amygdala is not "the fear center."** This popular label oversimplifies in two ways. First, the amygdala's functions extend well beyond threat — it responds to reward, salience, novelty, and social and ambiguous stimuli, and it modulates attention, perception, and memory. Second, and more importantly, current evidence indicates the amygdala is necessary for **detecting threat and driving non-conscious bodily/defensive responses**, but **not** for generating the *conscious feeling* of fear, which is assembled by cortical cognitive systems (see §5.2 and §9.5). A "hub in a distributed threat circuit" is a more accurate framing than "the seat of fear." Patients with bilateral amygdala damage (e.g., in Urbach–Wiethe disease) can still report fear under some conditions — such as CO₂-induced suffocation panic — which underscores that the amygdala is one node, not the whole.
 
 ### 5.2 The "low road" and the "high road" (LeDoux)
 
@@ -183,6 +218,8 @@ The neuroscientist **Joseph LeDoux** described two parallel pathways by which se
 - **The "high road."** A slower route from the thalamus through the **sensory cortex** (and prefrontal cortex) and then to the amygdala. It delivers a detailed, contextualized analysis that can confirm or cancel the alarm.
 
 The low road's evolutionary logic is stark: the cost of a false alarm (flinching at a rope) is trivial next to the cost of a missed real threat (a snake). Speed is bought at the price of accuracy, and the cortical high road corrects the errors a moment later.
+
+> **Two important caveats on the "two roads" model.** (1) *LeDoux himself has cautioned against the popular framing.* The direct thalamo-amygdala pathway was characterized largely in **rodent auditory fear conditioning**; its functional prominence in humans — especially the proposed subcortical *visual* route via the superior colliculus and pulvinar — is **contested**. Pessoa and Adolphs (2010) reviewed the anatomy and argued this pathway is unlikely to be the main channel for affective processing in primates, favoring a "many roads," cortically-weighted account (though recent high-resolution human tractography again reports direct thalamo-amygdala connections — the question remains open). (2) *LeDoux now explicitly distinguishes the non-conscious "defensive survival circuits" that the low road serves from the conscious feeling of fear* (see §9.5). He has argued the pathway should be understood as a fast **threat-detection/response** route, **not** a route that produces the subjective experience of being afraid. Treat the "low road/high road" diagram as a useful teaching heuristic, not a settled literal wiring diagram.
 
 ### 5.3 Fear conditioning and extinction
 
@@ -239,7 +276,7 @@ The effect of stress hormones on memory is famously **non-monotonic**, following
 
 But the story is stage- and structure-dependent:
 
-- **Consolidation (forming new memories).** Glucocorithoids, acting together with adrenaline and the amygdala, **enhance the consolidation** of emotionally arousing memories — which is why you vividly remember frightening or exciting events. The BLA is essential: it modulates hippocampal consolidation so that emotional events are preferentially stamped in.
+- **Consolidation (forming new memories).** Glucocorticoids, acting together with adrenaline and the amygdala, **enhance the consolidation** of emotionally arousing memories — which is why you vividly remember frightening or exciting events. The BLA is essential: it modulates hippocampal consolidation so that emotional events are preferentially stamped in.
 - **Retrieval and working memory.** Acutely elevated cortisol **impairs the retrieval** of already-stored memories and disrupts prefrontal **working memory** — the reason people "blank out" under acute stress (e.g., in an exam or on the witness stand).
 - **Structure matters.** The inverted-U is most characteristic of **hippocampus-dependent** (explicit, contextual) memory. For strongly **amygdala-dependent** learning (simple cued fear conditioning), the relationship is more nearly **linear** — more stress, stronger memory — which contributes to the intrusive, overconsolidated emotional memories of trauma.
 

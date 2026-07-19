@@ -123,6 +123,13 @@ No single hallmark acts alone. Mitochondrial dysfunction generates ROS; ROS dama
 
 One of the most clinically important distinctions in the field is the continuum from healthy aging through **mild cognitive impairment (MCI)** to **dementia**. These are not sharply bounded categories but points along a spectrum, distinguished chiefly by *severity* and by *impact on daily function*.
 
+```mermaid
+flowchart LR
+    A["Normal aging<br/>(fully independent)"] --> B["MCI<br/>(deficit greater than<br/>age norm; still independent)"]
+    B --> C["Dementia<br/>(loss of independence)"]
+    B -. "some remain stable<br/>or revert to normal" .-> A
+```
+
 | Feature | Normal Aging | Mild Cognitive Impairment (MCI) | Dementia |
 |---|---|---|---|
 | **Cognitive change** | Mild, expected for age | Greater than expected for age | Substantial across one or more domains |
@@ -162,6 +169,15 @@ Aβ42 monomers assemble into oligomers, then fibrils, and ultimately deposit as 
 
 The dominant framework for three decades has been the **amyloid cascade hypothesis**: accumulation of Aβ is the *initiating* event, which triggers downstream tau hyperphosphorylation and tangle formation, neuroinflammation, synaptic failure, neuronal loss, and ultimately dementia.
 
+```mermaid
+flowchart TD
+    A["Aβ42 production exceeds clearance"] --> B["Soluble Aβ oligomers<br/>+ plaque deposition"]
+    B --> C["Tau hyperphosphorylation<br/>+ neurofibrillary tangles"]
+    C --> D["Neuroinflammation,<br/>synapse loss, neuronal death"]
+    D --> E["Dementia"]
+    N["Critiques: plaque burden correlates<br/>weakly with cognition; tau tracks<br/>decline better; amyloid may act in<br/>parallel or be a response to injury"] -.-> B
+```
+
 The hypothesis is supported by human genetics — every known deterministic mutation for early-onset familial AD increases Aβ42 production or its aggregation propensity, and Down syndrome (trisomy 21, three copies of the *APP* gene) causes early AD.
 
 But the hypothesis faces serious **critiques**:
@@ -200,7 +216,7 @@ Clinically, AD typically progresses:
 Treatments fall into two categories:
 
 - **Symptomatic**: **cholinesterase inhibitors** (donepezil, rivastigmine, galantamine) boost acetylcholine; the **NMDA-receptor antagonist memantine** modulates glutamate excitotoxicity in moderate–severe disease. These provide temporary symptomatic relief but **do not slow the underlying disease**.
-- **Disease-modifying anti-amyloid antibodies**: **lecanemab** (traditional FDA approval July 2023) and **donanemab** (FDA approval July 2024) are monoclonal antibodies that clear Aβ and, for the first time, produced a statistically significant **slowing of cognitive decline** in early AD — though the effect is **modest** in absolute terms. They carry a notable risk of **ARIA (amyloid-related imaging abnormalities)** — brain swelling and microhemorrhages — that is substantially higher in **APOE ε4 homozygotes** (on the order of ~35% risk versus ~5–10% in non-carriers). For this reason, **APOE genotyping is recommended before initiating treatment**, and patients require serial MRI monitoring. (The earlier antibody aducanumab was controversially approved in 2021 on a surrogate endpoint and later withdrawn from development.)
+- **Disease-modifying anti-amyloid antibodies**: **lecanemab** (traditional FDA approval July 2023) and **donanemab** (FDA approval July 2024) are monoclonal antibodies that clear Aβ and, for the first time, produced a statistically significant **slowing of cognitive decline** in early AD — though the effect is **modest** in absolute terms. They carry a notable risk of **ARIA (amyloid-related imaging abnormalities)** — brain swelling and microhemorrhages — that is substantially higher in **APOE ε4 homozygotes** — in the lecanemab trial, symptomatic-relevant ARIA-E occurred in roughly **33% of ε4 homozygotes versus ~5% of non-carriers**, with rates running still higher for donanemab (~41% vs ~16%). For this reason, **APOE genotyping is recommended before initiating treatment**, and patients require serial MRI monitoring. (The earlier antibody aducanumab was controversially approved in 2021 on a surrogate endpoint and later withdrawn from development.)
 
 ---
 
@@ -252,7 +268,7 @@ Beyond Alzheimer's and Parkinson's, several other diseases round out the neurode
 
 ### 6.1 Huntington's Disease
 
-Huntington's disease (HD) is an **autosomal-dominant** disorder caused by an **expanded CAG trinucleotide repeat** in the **huntingtin (HTT) gene**. Unaffected individuals carry roughly 15–30 CAG repeats; HD results from **36 or more** repeats (the great majority of cases having 40–49). The expansion encodes an abnormally long **polyglutamine (polyQ)** tract, causing the huntingtin protein to **misfold and aggregate**. Longer repeats correlate with **earlier onset** (CAG length explains roughly 50–70% of the variability in age of onset), and repeats can **expand across generations** ("anticipation"). Pathology centers on the **striatum** (caudate and putamen), producing the characteristic triad of **chorea** (involuntary dance-like movements), **cognitive decline**, and **psychiatric symptoms**, typically emerging between ages 30 and 50. Because the genetic cause is singular and known, HD is a prime target for gene-silencing therapies (see §9).
+Huntington's disease (HD) is an **autosomal-dominant** disorder caused by an **expanded CAG trinucleotide repeat** in the **huntingtin (HTT) gene**. Unaffected individuals carry roughly 15–30 CAG repeats; HD results from **36 or more** repeats — though **36–39 repeats confer reduced penetrance** (disease may or may not manifest in a normal lifespan), while **40 or more repeats are fully penetrant** and account for the great majority of symptomatic cases (typically 40–49). The expansion encodes an abnormally long **polyglutamine (polyQ)** tract, causing the huntingtin protein to **misfold and aggregate**. Longer repeats correlate with **earlier onset** (CAG length explains roughly 50–70% of the variability in age of onset), and repeats can **expand across generations** ("anticipation"). Pathology centers on the **striatum** (caudate and putamen), producing the characteristic triad of **chorea** (involuntary dance-like movements), **cognitive decline**, and **psychiatric symptoms**, typically emerging between ages 30 and 50. Because the genetic cause is singular and known, HD is a prime target for gene-silencing therapies (see §9).
 
 ### 6.2 Amyotrophic Lateral Sclerosis (ALS)
 

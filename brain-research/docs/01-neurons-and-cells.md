@@ -190,7 +190,11 @@ They are broadly divided into **macroglia** (astrocytes, oligodendrocytes, Schwa
 
 ### 3.1 Astrocytes
 
-Star-shaped cells of the CNS and the most abundant glia. Their many functions include:
+Star-shaped cells of the CNS, traditionally described as the most abundant glia. Modern
+quantitative counts complicate that claim: by number, **oligodendrocytes** appear to be the most
+numerous glial type across the whole human brain (~45–75% of glia), with astrocytes (~19–40%)
+predominating in the cortex and gray matter. Regardless of the head-count, astrocytes are
+functionally central. Their many functions include:
 
 - **Ionic homeostasis** — buffering extracellular **K⁺** (which accumulates during firing) and
   regulating pH and osmolarity.
@@ -449,6 +453,18 @@ chemical one and back to an electrical one, with a characteristic **synaptic del
    **acetylcholinesterase** hydrolyzing ACh), and/or (c) simple **diffusion** away from the synapse.
 8. **Vesicle recycling.** Fused membrane is retrieved (e.g., by clathrin-mediated endocytosis) and
    refilled with transmitter for reuse.
+
+```mermaid
+flowchart TD
+    A[AP invades presynaptic terminal] --> B[Voltage-gated Ca2+ channels open]
+    B --> C[Ca2+ influx: steep local microdomains]
+    C --> D[Synaptotagmin senses Ca2+]
+    D --> E[SNARE complex zippers: docked vesicle fuses]
+    E --> F[Neurotransmitter released into cleft]
+    F --> G[Binds postsynaptic receptors: EPSP or IPSP]
+    F --> H[Cleared: reuptake / enzymatic breakdown / diffusion]
+    E --> I[Vesicle membrane retrieved and refilled]
+```
 
 The SNARE machinery is the target of potent toxins: **botulinum** and **tetanus** neurotoxins are
 proteases that cleave SNARE proteins, blocking release and causing paralysis.

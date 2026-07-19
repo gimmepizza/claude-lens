@@ -60,6 +60,20 @@ These terms combine with the somatic/autonomic axis (e.g., somatic afferents car
 | Direction | Afferent (sensory, toward CNS) | Efferent (motor, away from CNS) |
 | Autonomic tone | Sympathetic (arousing) | Parasympathetic (restorative) |
 
+The structural (CNS/PNS) and functional (somatic/autonomic) divisions nest as follows:
+
+```mermaid
+flowchart TD
+    NS[Nervous system]
+    NS --> CNS[Central NS<br/>brain + spinal cord]
+    NS --> PNS[Peripheral NS<br/>cranial + spinal nerves, ganglia, receptors]
+    PNS --> SOM[Somatic<br/>voluntary skeletal muscle]
+    PNS --> AUT[Autonomic<br/>involuntary smooth/cardiac muscle, glands]
+    AUT --> SYM[Sympathetic<br/>fight-or-flight]
+    AUT --> PAR[Parasympathetic<br/>rest-and-digest]
+    AUT --> ENT[Enteric<br/>gut wall]
+```
+
 ---
 
 ## 2. Protection and Fluid Systems: Meninges, Ventricles, and CSF
@@ -223,7 +237,7 @@ The **thalamus** is a pair of large egg-shaped gray-matter masses forming the wa
 | **Ventral posterolateral (VPL)** | Body somatosensation | Somatosensory cortex |
 | **Ventral posteromedial (VPM)** | Face somatosensation/taste | Somatosensory cortex |
 | **Ventral lateral / anterior (VL/VA)** | Motor signals (from cerebellum, basal ganglia) | Motor cortex |
-| **Anterior nuclei** | Limbic (from mammillary bodies via fornix) | Cingulate cortex |
+| **Anterior nuclei** | Limbic (from mammillary bodies via the mammillothalamic tract; also directly from hippocampus via the fornix) | Cingulate cortex |
 
 Beyond relay, the thalamus regulates **consciousness, sleep, arousal, and attention** through its reticular and intralaminar nuclei, gating which signals reach the cortex.
 
@@ -256,6 +270,23 @@ The GPi and SNr are the main **output nuclei**; at rest they tonically **inhibit
 - **Direct ("Go") pathway:** cortex → striatum (D1 neurons) → *inhibits* GPi/SNr → *disinhibits* thalamus → **facilitates** movement. Net effect: excitatory to cortex.
 - **Indirect ("No-Go") pathway:** cortex → striatum (D2 neurons) → GPe → STN → GPi/SNr → *increases* inhibition of thalamus → **suppresses** movement. Net effect: inhibitory to cortex.
 
+```mermaid
+flowchart LR
+    CTX[Cortex]
+    CTX -->|Go: D1| STR1[Striatum]
+    CTX -->|No-Go: D2| STR2[Striatum]
+    STR1 -.inhibits.-> OUT[GPi / SNr<br/>output nuclei]
+    STR2 -.inhibits.-> GPe[GPe]
+    GPe -.inhibits.-> STN[STN]
+    STN -->|excites| OUT
+    OUT -.inhibits.-> THAL[Thalamus]
+    THAL -->|excites| CTX
+    SNc[SNc dopamine] -->|D1 +, D2 -| STR1
+    SNc --> STR2
+```
+
+Dashed arrows are inhibitory, solid arrows excitatory. The direct pathway removes the thalamic brake (net facilitation); the indirect pathway reinforces it (net suppression).
+
 **Dopamine** from the SNc tunes this balance: acting on **D1 receptors it enhances the direct pathway**, and on **D2 receptors it inhibits the indirect pathway** — both actions promote movement. This circuit logic explains the two great classes of basal-ganglia disorder:
 - **Parkinson's disease** — loss of SNc dopamine neurons shifts the balance toward the indirect pathway, producing *hypokinetic* signs (rigidity, bradykinesia, tremor).
 - **Huntington's disease** — early loss of indirect-pathway striatal neurons releases movement, producing *hyperkinetic* signs (chorea).
@@ -272,7 +303,7 @@ The **limbic system** is a loosely defined ring of structures on the medial surf
 - **Amygdala** — an almond-shaped nucleus just anterior to the hippocampus, central to **fear, threat detection, and emotional salience**, and to attaching emotional weight to memories. It rapidly triggers autonomic and behavioral fear responses.
 - **Cingulate cortex** — the cortex arching over the corpus callosum. Its **anterior** portion is involved in emotion regulation, conflict/error monitoring, and pain; its **posterior** portion in memory and self-referential processing.
 - **Fornix** — the major output tract of the hippocampus, a white-matter arch carrying fibers to the **mammillary bodies** and anterior thalamus.
-- **Mammillary bodies** — relay hippocampal output into the thalamus; damaged in Wernicke–Korsakoff syndrome (thiamine deficiency), causing amnesia.
+- **Mammillary bodies** — relay hippocampal output (received via the fornix) onward to the anterior thalamus through the **mammillothalamic tract**; damaged in Wernicke–Korsakoff syndrome (thiamine deficiency), causing amnesia.
 - **Parahippocampal and entorhinal cortex** — the cortical gateway funneling multimodal association input into the hippocampus.
 - **Hypothalamus** — the effector arm, translating limbic activity into autonomic and endocrine output.
 

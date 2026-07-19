@@ -31,6 +31,22 @@ Plasticity is the physical substrate of learning and memory, the mechanism by wh
 
 Plasticity is not a single process but a family of them, operating on scales from nanometers (a single synapse) to centimeters (a cortical map) and from milliseconds to years. Several orthogonal distinctions are useful.
 
+```mermaid
+graph TD
+    P[Neuroplasticity]
+    P --> F[Functional<br/>changes efficacy of existing connections]
+    P --> S[Structural<br/>changes physical hardware]
+    F --> F1[Hebbian: LTP / LTD, STDP<br/>input-specific, positive feedback]
+    F --> F2[Homeostatic: synaptic scaling,<br/>intrinsic excitability, E/I balance]
+    F --> F3[Metaplasticity<br/>sets threshold for future change]
+    S --> S1[Dendritic spine growth,<br/>enlargement, pruning]
+    S --> S2[Synaptogenesis]
+    S --> S3[Axonal sprouting]
+    S --> S4[Neurogenesis<br/>new neurons, restricted niches]
+```
+
+Note that these axes are orthogonal, not exclusive: Hebbian and homeostatic mechanisms operate simultaneously, and strong functional potentiation is typically consolidated by structural change at the same synapse.
+
 ### Functional vs. Structural Plasticity
 
 - **Functional plasticity** changes how existing connections behave — the *strength* or *efficacy* of a synapse, the excitability of a membrane, or which pathways carry a given function — without necessarily adding or removing physical structures. Long-term potentiation of an existing synapse is the canonical example.
@@ -190,14 +206,14 @@ In rodents both niches are robustly active throughout life. In humans the pictur
 
 The modern debate crystallized in **2018**, when two high-profile studies reached opposite conclusions from human hippocampal tissue:
 
-- **Sorrells et al. (2018, *Nature*)** found that markers of new neurons in the dentate gyrus **dropped to undetectable levels during childhood**, concluding that hippocampal neurogenesis, if present in human adults, is extremely rare — implying the human hippocampus may differ from that of other mammals.
+- **Sorrells et al. (2018, *Nature*)** found that markers of new neurons in the dentate gyrus **declined sharply during childhood and were essentially undetectable in adult samples**, concluding that hippocampal neurogenesis, if it continues in human adults, is extremely rare — implying the human hippocampus may differ from that of other mammals. (The same steep decline was reported in rhesus macaques.)
 - **Boldrini et al. (2018, *Cell Stem Cell*)** examined 28 individuals aged 14–79 and reported **persistent neurogenesis into old age**, with preserved numbers of neural progenitors and immature neurons (though with some decline in vascularization and progenitor pool).
 
 The following year, **Moreno-Jiménez et al. (2019, *Nature Medicine*)** reported **thousands of immature (doublecortin-positive) neurons** in the dentate gyrus of neurologically healthy people from their 40s into their late 80s, with numbers declining sharply in Alzheimer's disease.
 
 **Why the disagreement?** Much of it is methodological. Human brain tissue must be chemically fixed, and the leading explanation is that **prolonged fixation in paraformaldehyde degrades the epitopes** (e.g., doublecortin) used to label young neurons — so studies with long or uncontrolled post-mortem fixation would *under*-count new neurons. Tissue quality, post-mortem interval, donor age distribution, and antibody specificity all matter. Newer approaches — single-nucleus RNA sequencing and improved markers — have been marshaled on both sides; some single-cell studies failed to find a clear neurogenic progenitor signature in adults, while others (and 2023-era analyses) reported molecular signatures consistent with ongoing, if low-level, neurogenesis. 
 
-**Current consensus (cautious):** The weight of evidence favors that *some* hippocampal neurogenesis persists in adult humans, but at a **low and age-declining rate**, and its **functional significance** in humans remains unproven. The field treats the question as genuinely open rather than settled, and readers should be wary of confident claims in either direction.
+**Where the field stands (genuinely unresolved):** No consensus exists. Many groups now lean toward the view that *some* hippocampal neurogenesis persists in adult humans at a **low and age-declining rate**, but this remains a provisional reading rather than a settled result — competing labs continue to report incompatible findings using different tissue, markers, and methods, and its **functional significance** in humans is unproven. Readers should be wary of confident claims in either direction.
 
 ### 7.3 Factors That Promote or Suppress Neurogenesis
 

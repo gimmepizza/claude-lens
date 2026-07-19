@@ -80,7 +80,7 @@ Fast excitation throughout cortex, hippocampus, and beyond; induction and expres
 
 ### Dysregulation: excitotoxicity
 
-Excessive glutamatergic signaling causes **excitotoxicity**. Sustained receptor activation — classically via NMDA receptors, though AMPA/kainate Ca²⁺ entry alone can suffice — drives pathological intracellular Ca²⁺ overload, which activates proteases, lipases, and nitric oxide synthase, generates reactive oxygen species, damages mitochondria, and triggers cell death. Excitotoxicity contributes to neuronal loss in **ischemic stroke**, traumatic brain injury, and chronic neurodegeneration (ALS, Alzheimer's, Huntington's). Therapeutically, **memantine**, a low-affinity uncompensating NMDA-receptor open-channel blocker, is used in moderate-to-severe Alzheimer's disease; **riluzole** (which reduces glutamate release/signaling) modestly extends survival in ALS; **perampanel**, an AMPA-receptor antagonist, is an antiseizure drug. Sub-anesthetic **ketamine**, an NMDA antagonist, produces rapid antidepressant effects, spotlighting glutamatergic mechanisms in mood disorders.
+Excessive glutamatergic signaling causes **excitotoxicity**. Sustained receptor activation — classically via NMDA receptors, though AMPA/kainate Ca²⁺ entry alone can suffice — drives pathological intracellular Ca²⁺ overload, which activates proteases, lipases, and nitric oxide synthase, generates reactive oxygen species, damages mitochondria, and triggers cell death. Excitotoxicity contributes to neuronal loss in **ischemic stroke**, traumatic brain injury, and chronic neurodegeneration (ALS, Alzheimer's, Huntington's). Therapeutically, **memantine**, a low-affinity, uncompetitive NMDA-receptor open-channel blocker (it enters preferentially when the channel is excessively open and has a fast off-rate, sparing normal synaptic transmission), is used in moderate-to-severe Alzheimer's disease; **riluzole** (which reduces glutamate release/signaling) modestly extends survival in ALS; **perampanel**, an AMPA-receptor antagonist, is an antiseizure drug. Sub-anesthetic **ketamine**, an NMDA antagonist, produces rapid antidepressant effects, spotlighting glutamatergic mechanisms in mood disorders.
 
 ---
 
@@ -120,6 +120,14 @@ Dopaminergic somata lie mainly in the midbrain (substantia nigra pars compacta, 
 - **Mesolimbic** (VTA → nucleus accumbens, amygdala, hippocampus) — reward, reinforcement, incentive salience; a common substrate of addiction.
 - **Mesocortical** (VTA → prefrontal cortex) — working memory, executive function, motivation.
 - **Tuberoinfundibular** (arcuate/periventricular hypothalamus → median eminence) — dopamine tonically **inhibits prolactin** release from the anterior pituitary.
+
+```mermaid
+flowchart LR
+    SNc[SNc] -->|Nigrostriatal| DS["Dorsal striatum<br/>movement — Parkinson's"]
+    VTA[VTA] -->|Mesolimbic| NAc["Nucleus accumbens<br/>reward — addiction, positive symptoms"]
+    VTA -->|Mesocortical| PFC["Prefrontal cortex<br/>working memory, executive"]
+    HYP["Arcuate hypothalamus"] -->|Tuberoinfundibular| PIT["Anterior pituitary<br/>inhibits prolactin"]
+```
 
 ### Receptors
 
@@ -163,7 +171,7 @@ Tonic modulation of mood and emotional resilience, sleep–wake regulation, sati
 
 ### Dysregulation and drugs
 
-Deficient serotonergic signaling is implicated in **depression and anxiety**. **SSRIs** (fluoxetine, sertraline, escitalopram) block SERT, raising synaptic serotonin; their therapeutic lag of weeks is thought to reflect gradual desensitization of 5-HT1A autoreceptors and downstream plasticity. **SNRIs** (venlafaxine, duloxetine) block serotonin and norepinephrine reuptake. **MAO inhibitors** and **tricyclics** are older options. Combining serotonergic agents can precipitate **serotonin syndrome** (agitation, hyperthermia, clonus, autonomic instability). Triptans (5-HT1B/1D agonists) abort migraine.
+Serotonergic signaling is heavily implicated in the *treatment* of **depression and anxiety**, but the classic "chemical imbalance" / low-serotonin theory of depression is not established and remains contested: a 2022 systematic umbrella review (Moncrieff et al.) found no consistent evidence that depression is caused by lowered serotonin concentration or activity, and the paper itself drew substantial methodological criticism. What is clear is that drugs raising synaptic serotonin can relieve symptoms in many patients — which does not imply a pre-existing serotonin deficit, any more than analgesic benefit implies an aspirin deficiency. **SSRIs** (fluoxetine, sertraline, escitalopram) block SERT, raising synaptic serotonin; their therapeutic lag of weeks is thought to reflect gradual desensitization of 5-HT1A autoreceptors and downstream adaptive plasticity (e.g., neurotrophic and synaptic changes) rather than the acute rise in serotonin per se. **SNRIs** (venlafaxine, duloxetine) block serotonin and norepinephrine reuptake. **MAO inhibitors** and **tricyclics** are older options. Combining serotonergic agents can precipitate **serotonin syndrome** (agitation, hyperthermia, clonus, autonomic instability). Triptans (5-HT1B/1D agonists) abort migraine.
 
 ---
 
@@ -271,6 +279,22 @@ Two broad signaling modes coexist in the brain.
 
 Psychoactive and therapeutic drugs work by intervening at defined steps of the neurotransmitter life cycle. The main pharmacological categories:
 
+```mermaid
+flowchart TD
+    D[Drug action on a transmitter system] --> R[At the receptor]
+    D --> T[At the transporter]
+    D --> E[At synthesis / degradation enzymes]
+    D --> V[At vesicular storage / release]
+    R --> AG["Agonist: full / partial"]
+    R --> AN["Antagonist: competitive / non-competitive"]
+    R --> AL["Allosteric modulator: positive / negative"]
+    T --> RI["Reuptake inhibitor<br/>SSRI, cocaine, atomoxetine"]
+    T --> RA["Releaser / transporter reverser<br/>amphetamine, MDMA"]
+    E --> EI["Enzyme inhibitor<br/>MAOIs, AChE inhibitors, COMT inhibitors"]
+    V --> VT["Vesicular / release blocker<br/>reserpine at VMAT2, botulinum toxin"]
+```
+
+
 - **Agonists** — bind and activate a receptor, mimicking the transmitter. *Full agonists* (morphine at μ-opioid; nicotine at nAChR) produce a maximal response; *partial agonists* (buprenorphine at μ-opioid; aripiprazole at D2; varenicline at α4β2 nAChR) give a submaximal, ceilinged effect and can buffer both deficiency and excess.
 - **Antagonists** — bind without activating, blocking the transmitter. *Competitive* antagonists (naloxone at μ-opioid; most antipsychotics at D2; atropine at muscarinic; flumazenil at the benzodiazepine site) compete at the orthosteric site; *irreversible/non-competitive* blockers act elsewhere or bind covalently.
 - **Reuptake inhibitors** — block a transporter so the released transmitter persists longer in the cleft. **SSRIs** (SERT), **SNRIs** (SERT + NET), **atomoxetine** (NET), **bupropion** (NET + DAT), **cocaine** (DAT/NET/SERT).
@@ -311,6 +335,8 @@ Representative mappings: caffeine → adenosine-receptor antagonist; nicotine �
 - [Dopamine Receptors in the Human Brain (Psychiatric Times)](https://www.psychiatrictimes.com/view/dopamine-receptors-human-brain)
 - [Mesolimbic Pathway overview (ScienceDirect Topics)](https://www.sciencedirect.com/topics/veterinary-science-and-veterinary-medicine/mesolimbic-pathway)
 - [The 5-Hydroxytryptamine signaling map (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC6235773/)
+- [The serotonin theory of depression: a systematic umbrella review of the evidence (Moncrieff et al., Molecular Psychiatry, 2022)](https://www.nature.com/articles/s41380-022-01661-0)
+- [Memantine mechanism: uncompetitive NMDA open-channel block (Memantine, StatPearls, NCBI Bookshelf)](https://www.ncbi.nlm.nih.gov/books/NBK500025/)
 - [5-Hydroxytryptamine Receptor Subtypes and their Modulators (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC3318857/)
 - [Neuroanatomy, Nucleus Raphe (StatPearls, NCBI Bookshelf)](https://www.ncbi.nlm.nih.gov/books/NBK544359/)
 - [The Locus Coeruleus–Norepinephrine System in Stress and Arousal (Frontiers in Psychiatry)](https://www.frontiersin.org/journals/psychiatry/articles/10.3389/fpsyt.2020.601519/full)
