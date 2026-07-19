@@ -62,8 +62,24 @@ first for the map, then dive into whichever system interests you.
 | 14 | [Neural Computation & the Brain–AI Comparison](docs/14-neural-computation-and-ai.md) | What "computation" means for a brain; Marr's levels; biological vs artificial neurons; backprop's biological implausibility and the alternatives; dopamine as reward-prediction-error; what neuroscience and AI have actually given each other |
 | 15 | [Synthesis & Open Questions](docs/15-synthesis-and-open-questions.md) | The ten principles that recur across every system, how the pieces interlock in one worked example, and an honest list of the field's biggest unsolved problems |
 
-*(30+ Mermaid diagrams are embedded throughout — pathway maps, cascades, feedback
-loops, and taxonomies — used only where a diagram makes a mechanism clearer.)*
+### Structural & clinical neuroanatomy
+*A gross- and clinical-anatomy layer added to mirror the coverage of a standard
+clinical neuroanatomy textbook (Inderbir Singh's *Textbook of Human
+Neuroanatomy*): the physical structures, the long tracts, the cranial and
+peripheral nerves, and how lesions localize. Educational, not medical advice.*
+
+| # | Document | What it covers |
+|---|----------|----------------|
+| 16 | [Development of the Nervous System](docs/16-development-neuroembryology.md) | Neuroembryology: neural induction and neurulation, the neural crest, dorsoventral and craniocaudal patterning, the brain vesicles and their derivatives, histogenesis and migration, and congenital malformations (neural tube defects, Chiari, hydrocephalus) |
+| 17 | [The Spinal Cord & Long Tracts](docs/17-spinal-cord-and-tracts.md) | External and internal cord anatomy, Rexed laminae, the ascending (DCML, spinothalamic, spinocerebellar) and descending (corticospinal, etc.) tracts, spinal reflexes, UMN vs LMN, cord blood supply, and clinical cord syndromes (Brown-Séquard, syringomyelia, ASA, SCD, tabes, ALS) |
+| 18 | [The Brainstem (Internal Anatomy) & Reticular Formation](docs/18-brainstem-and-reticular-formation.md) | The cranial-nerve-nucleus functional columns, cross-sectional anatomy of medulla/pons/midbrain, tracts passing through, the reticular formation and ARAS, and the crossed brainstem/vascular syndromes (Wallenberg, Weber, INO, locked-in) |
+| 19 | [The Twelve Cranial Nerves](docs/19-cranial-nerves.md) | The functional-component scheme; each nerve's nuclei, course, distribution, and lesion; the cranial parasympathetic outflow; key reflex arcs; and nuclear-vs-peripheral localization (Bell's vs UMN facial palsy, "down and out" third, tongue deviation, etc.) |
+| 20 | [The Peripheral Nervous System](docs/20-peripheral-nervous-system.md) | Peripheral nerve microstructure and fiber types, spinal nerves and rami, dermatomes/myotomes, the cervical/brachial/lumbosacral plexuses and their nerves, common nerve lesions (wrist/foot drop, claw/ape hand), and nerve injury, Wallerian degeneration & regeneration |
+| 21 | [Clinical Neuroanatomy & Lesion Localization](docs/21-clinical-neuroanatomy-localization.md) | The localization mindset: level-by-level signatures across the neuraxis, sensory/motor patterns, the internal capsule and vascular-territory strokes, the aphasias and disconnection syndromes, visual-pathway defects, herniation and raised ICP, hydrocephalus, and a deficit→site cheat-sheet |
+
+*(40+ Mermaid diagrams are embedded throughout — pathway maps, cascades, feedback
+loops, cross-sections, and taxonomies — used only where a diagram makes a mechanism
+or structure clearer.)*
 
 ---
 
@@ -110,10 +126,11 @@ principles together and marks where the map runs out.
   *Cell*, *Science*, *Physiological Reviews*, *World Psychiatry*, *Frontiers*, and
   *PNAS*, plus reputable references (StatPearls, Kenhub, Britannica, Wikipedia as
   an entry point).
-- Every core document was **independently fact-checked** by a second pass that
-  corrected real errors (e.g. a mislabeled thalamic tract, an overstated glial
-  count, out-of-date drug data) and hardened contested claims. Each document ends
-  with a linked **Sources** list.
+- The core neuroscience documents (01–08) were **independently fact-checked** by a
+  second adversarial pass that corrected real errors (e.g. a mislabeled thalamic
+  tract, an overstated glial count, out-of-date drug data) and hardened contested
+  claims. The remaining documents were cross-verified against multiple sources
+  during writing. Each document ends with a linked **Sources** list.
 - This material is **educational, not medical advice.** Neuroscience moves fast and
   many figures (neuron counts, timelines, receptor ratios) are best-estimate
   ranges, not fixed constants.
@@ -122,10 +139,9 @@ principles together and marks where the map runs out.
 
 ## Repository status
 
-This collection currently lives on the working branch
-`claude/human-brain-research-g2tdhu` inside the `claude-lens` repository, under the
-self-contained `brain-research/` directory. It is designed to be a **standalone
-private repository**: a portable, ready-to-push copy (with its own clean git
-history) is provided as `human-brain-neuroscience.bundle` in this directory —
-restore it with `git clone human-brain-neuroscience.bundle`, add a remote, and
-push.
+The primary home for this collection is the standalone private repository
+**`gimmepizza/gimmebrain`** (21 documents). A mirror also lives on the working
+branch `claude/human-brain-research-g2tdhu` inside the `claude-lens` repository,
+under the self-contained `brain-research/` directory, alongside a portable
+`human-brain-neuroscience.bundle` (a clean-history snapshot you can
+`git clone` directly).
