@@ -156,7 +156,7 @@ Once the tube is closed, its cells must acquire **dorsoventral identity** — do
 - **Ventral: Sonic hedgehog (Shh).** The **notochord** secretes Shh, which induces the ventral midline of the tube to become the **floor plate**; the floor plate then also secretes Shh. A **ventral-high, dorsal-low gradient of Shh** is established.
 - **Dorsal: BMPs and Wnts.** The overlying epidermal ectoderm and then the **roof plate** (the dorsal midline) secrete **BMPs and Wnts**, creating a **dorsal-high gradient**.
 
-Progenitors read their position as the ratio of these opposing signals. **Duration and concentration of Shh exposure** are translated into distinct combinations of transcription factors (the class I / class II homeodomain and bHLH factors — e.g., Nkx6.1, Olig2, Pax6, Dbx). These cross-repress one another to sharpen initially graded signals into **discrete progenitor domains** stacked along the dorsoventral axis, each producing a specific neuron type. The ventral-most (**pMN**) domain, exposed to the most Shh, produces **motor neurons**; more dorsal domains produce various interneurons; the dorsal-most produce sensory relay (commissural) neurons.
+Progenitors read their position as the ratio of these opposing signals. **Duration and concentration of Shh exposure** are translated into distinct combinations of transcription factors (the class I / class II homeodomain and bHLH factors — e.g., Nkx6.1, Olig2, Pax6, Dbx). These cross-repress one another to sharpen initially graded signals into **discrete progenitor domains** stacked along the dorsoventral axis, each producing a specific neuron type. A ventral (**pMN**) domain, exposed to high Shh, produces **motor neurons** (the still-more-ventral **p3** domain, under the highest neural-plate Shh, yields V3 interneurons, and the floor plate itself is the ventral-most, non-neuronal cell type); more dorsal domains produce various interneurons; the dorsal-most produce sensory relay (commissural) neurons.
 
 ### 4.2 Alar plate, basal plate, and the sulcus limitans
 
@@ -276,7 +276,7 @@ The **marginal zone** fills with ascending and descending axons to become the **
 
 At first the spinal cord runs the entire length of the vertebral canal, and spinal nerves exit horizontally. But the **vertebral column and dura grow faster and longer than the cord**, so the caudal end of the cord appears to **"ascend"** relative to the vertebrae — a differential-growth effect, not true migration. Consequences:
 
-- The **conus medullaris** ends at about **L3 at birth** and reaches the adult level of the **lower border of L1–L2** by around **2 years** of age.
+- The **conus medullaris** lies around **L1–L3 at birth** (modally already at **L1–L2**). Classic teaching describes further postnatal ascent to the adult **lower border of L1–L2** by ~2 years, but modern imaging and meta-analysis indicate the adult level is essentially reached by term (by ~week 26 of gestation), with only minor postnatal ascent.
 - Lumbosacral roots must run downward inside the canal to reach their now-caudal exit foramina, forming the **cauda equina**.
 - The stretched **filum terminale** (pial remnant, from the secondary neural tube) anchors the conus to the coccyx.
 
@@ -290,12 +290,12 @@ The cerebellum arises from the **dorsal metencephalon**, specifically from the *
 
 ### 8.1 Two germinal sources
 
-- **Ventricular zone (of the fourth-ventricle roof)** → the **GABAergic** neurons: **Purkinje cells** and the neurons of the **deep cerebellar nuclei**, plus Golgi, basket, and stellate interneurons.
-- **Rhombic lip** → the **glutamatergic** neurons: it produces cells that migrate **tangentially** over the surface to form a transient outer germinal sheet, the **external granular (germinal) layer (EGL)**.
+- **Ventricular zone (of the fourth-ventricle roof)** → the **GABAergic** neurons: **Purkinje cells**; the Golgi, basket, and stellate interneurons; and the **GABAergic** (interneuron and nucleo-olivary) neurons of the **deep cerebellar nuclei**.
+- **Rhombic lip** → the **glutamatergic** neurons: the **granule cells** (via the EGL below), the unipolar brush cells, and the large **glutamatergic projection neurons of the deep cerebellar nuclei** (so the deep nuclei are of dual origin — glutamatergic from the rhombic lip, GABAergic from the ventricular zone). Rhombic-lip cells migrate **tangentially** over the surface to form a transient outer germinal sheet, the **external granular (germinal) layer (EGL)**.
 
 ### 8.2 The external granular layer and postnatal amplification
 
-The **EGL is a secondary germinal zone on the cerebellar surface** that continues to proliferate massively **after birth** — the reason the cerebellum is exquisitely vulnerable to perinatal injury and produces the common childhood tumour **medulloblastoma**. Its proliferation is driven by **Sonic hedgehog secreted by the underlying Purkinje cells**. After dividing, each granule-cell precursor extends parallel-fibre axons and then migrates **inward**, past the Purkinje cell layer, guided by **Bergmann glial fibres**, to settle in the **internal granular layer** — the definitive granule-cell layer. The EGL is exhausted by roughly the end of the first postnatal year, and adult cerebellar cortex has its final three-layered structure (molecular, Purkinje, granular).
+The **EGL is a secondary germinal zone on the cerebellar surface** that continues to proliferate massively **after birth** — the reason the cerebellum is exquisitely vulnerable to perinatal injury and produces the common childhood tumour **medulloblastoma**. Its proliferation is driven by **Sonic hedgehog secreted by the underlying Purkinje cells**. After dividing, each granule-cell precursor extends parallel-fibre axons and then migrates **inward**, past the Purkinje cell layer, guided by **Bergmann glial fibres**, to settle in the **internal granular layer** — the definitive granule-cell layer. The EGL is exhausted around the end of the first to second postnatal year (largely gone by ~11–15 months), and adult cerebellar cortex has its final three-layered structure (molecular, Purkinje, granular).
 
 Cerebellar development thus extends well past birth and depends on the **roof of the fourth ventricle** and its coverings — which is exactly why malformations of that roof (**Dandy–Walker**) and of hindbrain size versus posterior-fossa volume (**Chiari**) are cerebellar/fourth-ventricular problems (Section 11).
 
@@ -428,7 +428,7 @@ The nervous system is assembled by an ordered application of a few reusable oper
 | **Weeks 5–20** | DV patterning (Shh/BMP); alar/basal plates; brainstem nuclei | Roof-plate defects → **Dandy–Walker / Chiari** |
 | **Weeks 7–20+** | Cortical neurogenesis + **radial migration** (inside-out) | **Lissencephaly, heterotopia, polymicrogyria** |
 | **Late fetal → years** | Gliogenesis; **myelination** (caudal→rostral, sensory→association) | Dysmyelination; protracted frontal maturation |
-| **Fetal → ~2 years** | Cord "ascent"; conus reaches L1–L2 | **Tethered cord** |
+| **Fetal (mostly by term)** | Cord "ascent"; conus at ~L1–L2 (minor postnatal change) | **Tethered cord** |
 
 The through-line: **induction sets fate, morphogen gradients set position, patterned proliferation sets number, directed migration sets place, and myelination sets speed** — each in its own window, each with a signature disorder when it fails. A neuroanatomist who can name the step and the week can usually predict both the malformation and why folate, a Shh mutation, or a microtubule gene produced it.
 

@@ -344,7 +344,7 @@ flowchart LR
 | **Parietal radiation** | Contralateral **inferior** quadrantanopia ("pie on the floor") | Superior retinal fibers run through parietal lobe |
 | **Occipital (visual) cortex** | Contralateral homonymous hemianopia **with macular sparing** | Dual (MCA+PCA) blood supply to the occipital pole |
 
-The chiasm case is the most famous: because the nasal retinal fibers (which see the *temporal* field) cross there, a central compressing mass — classically a pituitary adenoma pushing up — knocks out both temporal fields, giving **bitemporal hemianopia** ("tunnel-like" loss of peripheral vision). Just millimeters posteriorly, in the tract, the very same visual world produces an entirely different, homonymous defect — a vivid demonstration that in the visual system, *location is everything*.
+The chiasm case is the most famous: because the nasal retinal fibers (which see the *temporal* field) cross there, a central compressing mass — classically a pituitary adenoma pushing up — knocks out both temporal fields, giving **bitemporal hemianopia** (loss of the temporal half of each eye's field — the peripheral vision on both sides; not to be confused with the concentric constriction of true "tunnel vision"). Just millimeters posteriorly, in the tract, the very same visual world produces an entirely different, homonymous defect — a vivid demonstration that in the visual system, *location is everything*.
 
 ## 10. Raised Intracranial Pressure and Herniation
 

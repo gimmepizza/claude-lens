@@ -219,7 +219,7 @@ Fiber caliber predicts vulnerability. **Compression and demyelination** preferen
 heavily myelinated fibers (motor, proprioception, vibration lost early) — the picture of carpal
 tunnel or a demyelinating polyneuropathy. **Metabolic and toxic axonopathies** (diabetes, alcohol)
 hit the longest, smallest fibers first — the distal, length-dependent, "glove-and-stocking" loss of
-pain and temperature. **Local anesthetics** block small fibers (C, then B, then Aδ) before large,
+pain and temperature. **Local anesthetics** block small fibers (B, then C, then Aδ) before large,
 which is why pain goes before touch and touch before motor during a block.
 
 ---
