@@ -1,96 +1,122 @@
 # The Human Brain — A Comprehensive Reference
 
 An in-depth, source-cited reference on how the human brain works, spanning the
-full range from single molecules and cells up to memory, emotion, consciousness,
-and the decline of the aging brain. Each document is a standalone deep dive
-written from web-researched, cross-verified sources, with a linked **Sources**
-section at the end.
+full range from single molecules and cells up to perception, memory, emotion,
+action, consciousness, disease, and the decline of the aging brain. Each document
+is a standalone deep dive written from web-researched, cross-verified sources,
+with a linked **Sources** section at the end.
 
-> Scope: mainstream, well-established neuroscience, with contested or
-> actively-debated topics (e.g. adult human neurogenesis, theories of
-> consciousness, the amyloid hypothesis) explicitly flagged as such and
-> presented as competing views rather than settled fact.
+Every core document has been through an **adversarial fact-checking pass** — a
+second reviewer that actively tried to refute claims, validated citations against
+their sources, corrected errors, and flagged genuinely contested science rather
+than smoothing it over.
+
+> Scope & stance: mainstream, well-established neuroscience, with contested or
+> actively-debated topics (adult human neurogenesis, the amyloid hypothesis,
+> theories of consciousness, the microbiome–brain axis, the biology of mental
+> illness) explicitly flagged as unresolved and presented as competing views
+> rather than settled fact. **Educational, not medical advice.**
 
 ---
 
 ## How to use this collection
 
-The documents are numbered as a rough **bottom-up reading path** — from the
-biophysics of a single neuron up to whole-brain cognition and its breakdown —
-but each one stands on its own and cross-references the others.
+The documents are numbered as a rough **bottom-up path** — from the biophysics of
+a single neuron, up through systems and cognition, to disease, methods, and
+synthesis — but each stands on its own and cross-references the others. If you
+read only two things, read the [Synthesis](docs/15-synthesis-and-open-questions.md)
+first for the map, then dive into whichever system interests you.
 
+### Foundations
 | # | Document | What it covers |
 |---|----------|----------------|
 | 01 | [Neurons & Cellular Neuroscience](docs/01-neurons-and-cells.md) | Neuron anatomy and types, glial cells, myelination, membrane biophysics, the action potential, synaptic transmission, receptors, neuronal metabolism |
 | 02 | [Anatomy & Organization](docs/02-anatomy-and-organization.md) | CNS/PNS divisions, meninges/ventricles/CSF, blood-brain barrier and blood supply, brainstem, cerebellum, diencephalon, basal ganglia, limbic system, cortex and the four lobes, lateralization, connectomics |
 | 03 | [Neurotransmitter Systems](docs/03-neurotransmitter-systems.md) | Glutamate, GABA/glycine, dopamine, serotonin, norepinephrine, acetylcholine, histamine, neuropeptides, nitric oxide; pathways, receptors, and how drugs act on them |
+
+### Cognition & change
+| # | Document | What it covers |
+|---|----------|----------------|
 | 04 | [Learning & Memory](docs/04-learning-and-memory.md) | Memory taxonomy, working memory, the hippocampus and patient H.M., consolidation and sleep, LTP/LTD, engram cells, reconsolidation, forgetting, conditioning, amnesia |
 | 05 | [Neuroplasticity & Neurogenesis](docs/05-neuroplasticity.md) | Synaptic/structural/cortical plasticity, critical periods, experience-dependent change, cortical remapping, adult neurogenesis (and the debate), BDNF, recovery after injury, maladaptive plasticity |
-| 06 | [Stress & the Fight-or-Flight Response](docs/06-stress-and-fight-or-flight.md) | Autonomic nervous system, the fast SAM axis and slow HPA/cortisol axis, fight/flight/freeze/fawn, the amygdala and fear circuits, allostatic load, chronic-stress harms, vagal tone, theories of emotion |
-| 07 | [Aging & Neurodegeneration](docs/07-aging-and-neurodegeneration.md) | Normal brain aging, the molecular hallmarks of aging, the aging→MCI→dementia continuum, Alzheimer's, Parkinson's and other diseases, mechanisms of neuronal death, cognitive reserve and protective factors, the glymphatic system |
 | 08 | [Sleep, Consciousness & Development](docs/08-sleep-consciousness-development.md) | Sleep architecture and brain waves, circadian and homeostatic regulation, functions of sleep, attention and executive function, large-scale networks, theories of consciousness, brain development across the lifespan |
+
+### The brain in the body & world
+| # | Document | What it covers |
+|---|----------|----------------|
+| 06 | [Stress & the Fight-or-Flight Response](docs/06-stress-and-fight-or-flight.md) | Autonomic nervous system, the fast SAM axis and slow HPA/cortisol axis, fight/flight/freeze/fawn, the amygdala and fear circuits, allostatic load, chronic-stress harms, vagal tone, theories of emotion |
+| 09 | [Sensory Systems & Perception](docs/09-sensory-systems.md) | Shared principles of sensation; vision, hearing, somatosensation, pain/nociception, smell and taste, the vestibular sense; transduction, receptive fields, and perception as inference |
+| 10 | [Motor Systems & the Control of Action](docs/10-motor-systems.md) | The motor hierarchy, motor units and reflexes, descending pathways, M1 population coding, the basal ganglia and cerebellum, motor learning, internal models, and the volition/Libet debate |
+| 13 | [Body–Brain Interfaces](docs/13-body-brain-interfaces.md) | The gut–brain axis and microbiome (with the hype separated out), neuroimmunology and microglia, the neuroendocrine system, homeostasis and allostasis |
+
+### When it breaks, and how we know
+| # | Document | What it covers |
+|---|----------|----------------|
+| 07 | [Aging & Neurodegeneration](docs/07-aging-and-neurodegeneration.md) | Normal brain aging, the molecular hallmarks of aging, the aging→MCI→dementia continuum, Alzheimer's, Parkinson's and other diseases, mechanisms of neuronal death, cognitive reserve, the glymphatic system |
+| 11 | [Disorders & Mental Illness](docs/11-disorders-and-mental-illness.md) | Why psychiatric disorders resist single causes; depression, bipolar, anxiety/PTSD, schizophrenia, addiction, OCD, autism/ADHD, epilepsy, stroke/TBI — mechanisms, circuits, treatments, and the field's biomarker gaps |
+| 12 | [Methods of Neuroscience](docs/12-methods-of-neuroscience.md) | How we actually know all of this: imaging, electrophysiology, perturbation (lesions, TMS, optogenetics), molecular/genetic tools, model organisms, and the correlation-vs-causation and reproducibility problems |
+
+### Perspective & synthesis
+| # | Document | What it covers |
+|---|----------|----------------|
+| 14 | [Neural Computation & the Brain–AI Comparison](docs/14-neural-computation-and-ai.md) | What "computation" means for a brain; Marr's levels; biological vs artificial neurons; backprop's biological implausibility and the alternatives; dopamine as reward-prediction-error; what neuroscience and AI have actually given each other |
+| 15 | [Synthesis & Open Questions](docs/15-synthesis-and-open-questions.md) | The ten principles that recur across every system, how the pieces interlock in one worked example, and an honest list of the field's biggest unsolved problems |
+
+*(30+ Mermaid diagrams are embedded throughout — pathway maps, cascades, feedback
+loops, and taxonomies — used only where a diagram makes a mechanism clearer.)*
 
 ---
 
 ## The story these documents tell, in brief
 
 **It starts with the neuron.** The brain's ~86 billion neurons are electrochemical
-cells. A neuron holds a resting voltage of roughly −70 mV across its membrane,
-maintained by ion gradients and the Na⁺/K⁺ pump. When enough excitatory input
-pushes it past threshold, voltage-gated channels trigger an **action potential** —
-an all-or-none spike that races down the axon (jumping between nodes of Ranvier if
-myelinated) and, at the **synapse**, releases neurotransmitters onto the next cell.
-Glial cells — astrocytes, oligodendrocytes, microglia — are not passive scaffolding
-but active partners in signaling, insulation, immunity, and metabolism. *(See 01.)*
+cells. A neuron holds a resting voltage of roughly −70 mV, and when excitatory
+input pushes it past threshold it fires an **action potential** that races down the
+axon and, at the **synapse**, releases neurotransmitters onto the next cell. Glia
+are active partners, not scaffolding. *(01)*
 
-**Those cells are organized into a layered architecture.** Signals flow through the
-brainstem, cerebellum, thalamus, basal ganglia, and limbic structures up to the
-folded six-layered cortex, whose frontal, parietal, temporal, and occipital lobes
-specialize in movement, sensation, language, and perception — wired together by
-white-matter tracts into large-scale functional networks. *(See 02.)*
+**Those cells are organized into a layered, networked architecture** — brainstem,
+cerebellum, thalamus, basal ganglia, limbic structures, and the folded cortex —
+wired together into functional networks, with no single "center" for any function.
+*(02)* **Communication runs on chemistry:** fast glutamate/GABA signaling plus
+slow neuromodulators (dopamine, serotonin, norepinephrine, acetylcholine) that set
+tone for reward, mood, arousal, and attention. *(03)*
 
-**Communication runs on chemistry.** Fast point-to-point signaling uses glutamate
-(excitatory) and GABA (inhibitory), while slower **neuromodulators** — dopamine,
-serotonin, norepinephrine, acetylcholine — broadcast tone across whole regions,
-shaping reward, mood, arousal, and attention. Nearly every psychoactive drug works
-by nudging one of these systems. *(See 03.)*
+**The same synapses that transmit also change** — and that change, **plasticity**,
+is the most unifying idea in the field. It underlies **memory** *(04)*, learning,
+development, cortical remapping and recovery *(05)*, motor skill *(10)*, fear and
+its extinction *(06)*, and — when hijacked — addiction *(11)*.
 
-**The same synapses that transmit also change** — and that change is learning.
-**Long-term potentiation** strengthens co-active connections ("cells that fire
-together wire together"), the hippocampus binds experiences into new declarative
-memories, and sleep helps consolidate them. *(See 04.)* This capacity to rewire —
-**neuroplasticity** — reshapes cortical maps with experience, supports recovery
-after injury, and, in a limited way, even adds new neurons in adulthood. *(See 05.)*
+**The brain predicts rather than merely reacts.** Perception is inference on
+sensory data *(09)*; movement runs on forward models *(10)*; the body's set-points
+are defended by predictive **allostasis** through gut, immune, and endocrine
+channels *(13)*; and a perceived threat triggers the two-wave **stress response**
+*(06)*.
 
-**The brain also protects the body.** A perceived threat triggers the amygdala and
-a two-wave stress response: the fast adrenaline surge of **fight-or-flight** and the
-slower cortisol wave of the HPA axis. Acute stress is adaptive; chronic stress
-erodes the cardiovascular, immune, and even the hippocampal memory systems. *(See 06.)*
-
-**Over decades, the machinery wears down.** Normal aging brings modest volume loss
-and slower processing; disease brings the misfolded proteins and neuronal death of
-Alzheimer's, Parkinson's, and related disorders. Reserve built by education,
-exercise, sleep, and vascular health measurably buffers the decline. *(See 07.)*
-
-**And underlying it all are the states of the whole system** — the daily cycle of
-sleep that clears waste and consolidates memory, the attentional and executive
-control of the prefrontal cortex, the networks whose interplay may give rise to
-consciousness, and the decades-long developmental program that builds and prunes
-the brain from the womb to old age. *(See 08.)*
+**Over time the machinery wears down** — modest in normal aging, catastrophic in
+the misfolded-protein diseases of Alzheimer's and Parkinson's *(07)* — and it can
+misfire in the psychiatric disorders whose biology we still barely understand
+*(11)*. **All of this knowledge is bounded by method** *(12)*, and comparing the
+brain to artificial neural networks *(14)* sharpens what is genuinely special about
+it. The [synthesis](docs/15-synthesis-and-open-questions.md) *(15)* ties the
+principles together and marks where the map runs out.
 
 ---
 
 ## Notes on sourcing and reliability
 
-- Each document was researched from multiple authoritative sources — including
-  **NIH/NCBI/PubMed Central, NINDS, the National Institute on Aging**, peer-reviewed
-  reviews in *Nature*, *Cell*, *Physiological Reviews*, *Frontiers*, and *PNAS*, plus
-  reputable references (StatPearls, Kenhub, Britannica, Wikipedia as an entry point).
-- Key facts were cross-checked across sources; every document ends with a linked
-  **Sources** list.
-- This material is **educational**, not medical advice. Neuroscience is a fast-moving
-  field and some numbers (e.g. neuron counts, timelines) are best-estimate ranges,
-  not fixed constants.
+- Researched from authoritative sources — **NIH/NCBI/PubMed Central, NINDS, NIMH,
+  NIDA, the National Institute on Aging**, peer-reviewed reviews in *Nature*,
+  *Cell*, *Science*, *Physiological Reviews*, *World Psychiatry*, *Frontiers*, and
+  *PNAS*, plus reputable references (StatPearls, Kenhub, Britannica, Wikipedia as
+  an entry point).
+- Every core document was **independently fact-checked** by a second pass that
+  corrected real errors (e.g. a mislabeled thalamic tract, an overstated glial
+  count, out-of-date drug data) and hardened contested claims. Each document ends
+  with a linked **Sources** list.
+- This material is **educational, not medical advice.** Neuroscience moves fast and
+  many figures (neuron counts, timelines, receptor ratios) are best-estimate
+  ranges, not fixed constants.
 
 ---
 
@@ -98,7 +124,8 @@ the brain from the womb to old age. *(See 08.)*
 
 This collection currently lives on the working branch
 `claude/human-brain-research-g2tdhu` inside the `claude-lens` repository, under the
-self-contained `brain-research/` directory. It was intended to be a **standalone
-private repository**; the folder is deliberately portable, so it can be lifted out
-and pushed to a dedicated private repo at any time (`cd brain-research && git init`,
-add a remote, push).
+self-contained `brain-research/` directory. It is designed to be a **standalone
+private repository**: a portable, ready-to-push copy (with its own clean git
+history) is provided as `human-brain-neuroscience.bundle` in this directory —
+restore it with `git clone human-brain-neuroscience.bundle`, add a remote, and
+push.
