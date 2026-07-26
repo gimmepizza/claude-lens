@@ -10,10 +10,23 @@ There is no single ladder.**
 
 | File | What it is |
 |------|-----------|
-| [`brain-complexity.html`](brain-complexity.html) | Self-contained **interactive** page (hover tooltips, cognition-axis toggle, weighting presets, light/dark). Open directly or view as an artifact. |
-| `png/` | Static PNG of each chart, plus full-page `all-light.png` / `all-dark.png` |
+| [`brain-complexity.html`](brain-complexity.html) | Self-contained **interactive** page — biological brain complexity across 19 animals (hover tooltips, cognition-axis toggle, weighting presets, light/dark). |
+| [`brain-vs-ai.html`](brain-vs-ai.html) | Self-contained **interactive** page — **LLMs vs biological brains** on the honest parameters↔synapses axis (see [doc 19](../animals/19-artificial-minds-llms.md)). |
+| `png/` | Static PNG of each chart (`*.png` for the biological set, `ai-*.png` for the LLM set), plus full-page exports |
 | `svg/` | Static SVG (vector) of each chart |
-| `data/brain-complexity.csv` | The underlying dataset (source of truth) |
+| `data/brain-complexity.csv` | The underlying biological dataset (source of truth) |
+
+## The LLM comparison (`brain-vs-ai.html`)
+
+A companion page placing large language models beside biological nervous systems on
+the **one defensible shared axis: learned connections** — synapses in a brain,
+parameters in a model (never parameters↔neurons). The finding: frontier LLMs sit at
+**mouse-scale** connection counts (~10¹²), ~100–1000× below the human ~10¹⁴–10¹⁵
+synapses, reaching language via a completely different bargain (10⁴–10⁵× more
+training data, vastly more energy). Charts: the connections lollipop, the scaling
+trajectory vs biological reference lines, data-efficiency, energy, and a
+transcends-vs-diverges summary. Full analysis in
+[doc 19, *Artificial Minds — LLMs in the Comparison*](../animals/19-artificial-minds-llms.md).
 
 ## The six charts
 

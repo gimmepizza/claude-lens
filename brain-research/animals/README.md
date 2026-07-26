@@ -48,6 +48,11 @@ model uniquely gave us — then dive into any species below.
 | 17 | [Zebrafish](17-zebrafish.md) | Whole-brain single-neuron imaging in a behaving vertebrate; CNS regeneration |
 | 18 | [Lamprey & basal vertebrates](18-lamprey-basal-vertebrates.md) | The ancestral vertebrate ground plan — locomotor CPGs and a 560-My-old basal ganglia |
 
+## Artificial minds (not an animal)
+| # | Entry | Focus |
+|---|-------|-------|
+| 19 | [Artificial Minds — LLMs in the Comparison](19-artificial-minds-llms.md) | Large language models placed beside biological brains on the honest parameters↔synapses axis: they sit at **mouse-scale** connection counts, far below human, reaching language via 10⁴–10⁵× more data and vastly more energy. What genuinely transcends the biological/artificial divide (scaling laws, distributed representation) — and what doesn't. Paired with the [`brain-vs-ai`](../graphics/brain-vs-ai.html) graphics. |
+
 ---
 
 *~7,300 lines and 50+ diagrams across the comparative layer. Educational, not

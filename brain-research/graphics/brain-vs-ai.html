@@ -1,0 +1,281 @@
+<style>
+  :root{
+    color-scheme: light;
+    --plane:#f9f9f7; --surface-1:#fcfcfb;
+    --text-primary:#0b0b0b; --text-secondary:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --bio:#2a78d6; --ai:#eb6834; --refline:#898781;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface-1:#1a1a19;
+      --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+      --bio:#3987e5; --ai:#d95926; --refline:#898781;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface-1:#1a1a19;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+    --bio:#3987e5; --ai:#d95926; --refline:#898781;
+  }
+  *{ box-sizing:border-box; } body{ margin:0; }
+  .wrap{ font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--plane); color:var(--text-primary); padding:28px 20px 64px; max-width:960px; margin:0 auto; line-height:1.5; }
+  .wrap h1{ font-size:1.7rem; margin:0 0 6px; letter-spacing:-0.01em; }
+  .wrap h2{ font-size:1.15rem; margin:0 0 4px; letter-spacing:-0.01em; }
+  .sub{ color:var(--text-secondary); margin:0 0 18px; max-width:72ch; }
+  .assump{ background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin:0 0 22px; font-size:0.86rem; color:var(--text-secondary); }
+  .assump b{ color:var(--text-primary); }
+  .assump ul{ margin:8px 0 0; padding-left:18px; } .assump li{ margin:3px 0; }
+  .controls{ display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin:0 0 22px; }
+  .note{ font-size:0.82rem; color:var(--text-secondary); }
+  .seg{ display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .seg button{ font:inherit; font-size:0.8rem; border:0; background:var(--surface-1); color:var(--text-secondary); padding:5px 10px; cursor:pointer; border-right:1px solid var(--border); }
+  .seg button:last-child{ border-right:0; }
+  .seg button[aria-pressed="true"]{ background:var(--bio); color:#fff; }
+  .card{ background:var(--surface-1); border:1px solid var(--border); border-radius:14px; padding:18px 18px 12px; margin:0 0 22px; }
+  .card .cap{ color:var(--text-secondary); font-size:0.86rem; margin:2px 0 12px; max-width:80ch; }
+  .card svg[role="img"]{ width:100%; height:auto; display:block; overflow:visible; }
+  .legend{ display:flex; flex-wrap:wrap; gap:6px 16px; margin:10px 2px 2px; font-size:0.8rem; color:var(--text-secondary); }
+  .legend .lg{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+  .legend .lg svg{ width:15px; height:15px; vertical-align:middle; flex:0 0 auto; }
+  .tick text, .axlabel{ fill:var(--muted); font-size:11px; }
+  .axlabel-strong{ fill:var(--text-secondary); font-size:12px; font-weight:600; }
+  .datalabel{ fill:var(--text-secondary); font-size:11px; }
+  .datalabel.tab{ font-variant-numeric:tabular-nums; }
+  .gridline{ stroke:var(--grid); stroke-width:1; }
+  .tiles{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:6px 0 4px; }
+  .tile{ border:1px solid var(--border); border-radius:12px; padding:14px; }
+  .tile .big{ font-size:1.5rem; font-weight:700; letter-spacing:-0.01em; }
+  .tile .lab{ font-size:0.82rem; color:var(--text-secondary); margin-top:2px; }
+  .tile .sub2{ font-size:0.78rem; color:var(--muted); margin-top:6px; }
+  .tile.bioT .big{ color:var(--bio); } .tile.aiT .big{ color:var(--ai); }
+  .takeaway{ font-size:0.86rem; color:var(--text-secondary); margin:12px 2px 2px; }
+  details.table{ margin:6px 0 26px; font-size:0.82rem; color:var(--text-secondary); }
+  details.table summary{ cursor:pointer; }
+  table.data{ border-collapse:collapse; margin:10px 0; width:100%; font-variant-numeric:tabular-nums; }
+  table.data th, table.data td{ border:1px solid var(--border); padding:4px 8px; text-align:right; }
+  table.data th:first-child, table.data td:first-child{ text-align:left; }
+  table.data th{ color:var(--text-secondary); font-weight:600; }
+  footer{ font-size:0.8rem; color:var(--text-secondary); border-top:1px solid var(--border); padding-top:14px; margin-top:8px; }
+  #tooltip{ position:fixed; pointer-events:none; z-index:50; opacity:0; transition:opacity .08s; background:var(--surface-1); color:var(--text-primary); border:1px solid var(--border); border-radius:9px; padding:8px 10px; font-size:0.8rem; box-shadow:0 6px 24px rgba(0,0,0,0.18); max-width:260px; line-height:1.4; }
+  #tooltip .k{ color:var(--text-secondary); }
+  a{ color:var(--bio); }
+</style>
+
+<div class="wrap">
+  <h1>Biological Brains vs LLMs — One Honest Axis</h1>
+  <p class="sub">Placing large language models beside biological nervous systems on the <b>only defensible shared scale</b>: learned connections — <b>synapses</b> in a brain, <b>parameters</b> in a model. The result overturns the usual "AI already beats the brain" story, and points to what actually transcends the divide.</p>
+
+  <div class="assump">
+    <b>The unit rule (why this isn't the usual comparison)</b>
+    <ul>
+      <li><b>Parameters ↔ synapses</b>, never parameters ↔ neurons. Both are the <i>learned connection weights</i> — the thing that stores what the system knows. This is the one axis where the comparison is fair.</li>
+      <li><b>An LLM "neuron" is not a neuron</b> (no dendrites, spikes, or neuromodulation), so neuron-count comparisons are excluded here.</li>
+      <li><b>No single "intelligence" score.</b> LLMs are superhuman at some tasks and absent capacities (embodiment, continual learning) at others — a single number would mislead. Capability is discussed, not plotted.</li>
+      <li><b>Numbers are best-estimates.</b> Closed-model parameters (esp. GPT-4) are unconfirmed; synapse counts are order-of-magnitude. Everything is on log scales.</li>
+    </ul>
+  </div>
+
+  <div class="controls">
+    <span class="note">Theme</span>
+    <span class="seg" role="group" aria-label="theme">
+      <button id="th-light" aria-pressed="false">Light</button>
+      <button id="th-dark" aria-pressed="false">Dark</button>
+    </span>
+  </div>
+
+  <div class="card">
+    <h2>1 · Where LLMs actually sit, by connection count</h2>
+    <p class="cap">Every system on one log axis of learned connections (biological synapses / model parameters), sorted. Frontier LLMs interleave around the <b>mouse</b> — roughly 100–1000× below the human brain. Impressive competence at small-mammal connectivity, reached by a different route.</p>
+    <div id="c1"></div>
+    <div class="legend" id="lg1"></div>
+  </div>
+
+  <div class="card">
+    <h2>2 · The scaling trajectory vs biological reference lines</h2>
+    <p class="cap">LLM parameter counts over time (log). Even the steep climb sits between the mouse and human synapse lines — the trajectory is approaching small-mammal scale, not human scale.</p>
+    <div id="c2"></div>
+    <div class="legend" id="lg2"></div>
+  </div>
+
+  <div class="card">
+    <h2>3 · Data efficiency — the largest divergence</h2>
+    <p class="cap">Language a system sees to become fluent (log). A human: ~10⁸ words by adulthood. An LLM: 10¹²–10¹³ tokens — <b>10,000–100,000× more</b>. Whatever the brain does, it is not this.</p>
+    <div id="c3"></div>
+    <div class="legend" id="lg3"></div>
+  </div>
+
+  <div class="card">
+    <h2>4 · Energy — the second-largest divergence</h2>
+    <p class="cap">Per unit of capability, biology is orders of magnitude cheaper.</p>
+    <div class="tiles">
+      <div class="tile bioT"><div class="big">~20 W</div><div class="lab">Human brain, continuous</div><div class="sub2">≈175 kWh per year, for a lifetime</div></div>
+      <div class="tile aiT"><div class="big">~1,287 MWh</div><div class="lab">Training GPT-3 (one-time)</div><div class="sub2">≈ the brain's output for ~7,000 years</div></div>
+      <div class="tile aiT"><div class="big">~0.3 Wh</div><div class="lab">Per ChatGPT query</div><div class="sub2">× billions of queries per day</div></div>
+    </div>
+    <p class="takeaway"><b>Takeaway:</b> the brain reaches its capability on a light-bulb's worth of power sustained for decades; today's models spend a small town's worth to train, then more per query at planetary query volumes.</p>
+  </div>
+
+  <div class="card">
+    <h2>5 · What transcends the divide — and what doesn't</h2>
+    <p class="cap">The honest answer to "is there a pattern across biological and artificial brains?"</p>
+    <div id="c5"></div>
+  </div>
+
+  <details class="table">
+    <summary>Show the underlying data</summary>
+    <div id="dtable"></div>
+  </details>
+
+  <footer>
+    <b>Sources &amp; caveats.</b> Scaling laws: Kaplan et al. 2020; Hoffmann et al. (Chinchilla) 2022. Model specs: DeepSeek-V3 report 2024; Llama 3.1 (Meta); GPT-3 (OpenAI). Energy: Patterson et al. 2021 (GPT-3 ≈1,287 MWh); Epoch AI (≈0.3 Wh/query). Human synapses ≈10¹⁴–10¹⁵ (neocortex ≈164 T ±17%); fruit-fly connectome ≈54.5 M synapses (2024). GPT-4 parameters are an unconfirmed estimate. Companion to <a href="brain-complexity.html">the biological complexity graphics</a> and <i>gimmebrain</i> doc 19. Educational, not a definitive ranking.
+  </footer>
+</div>
+<div id="tooltip"></div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+// connections: biological = synapses, LLM = parameters
+const CONN=[
+ {n:"C. elegans", k:"bio", v:7.5e3},
+ {n:"Fruit fly", k:"bio", v:5.45e7},
+ {n:"BERT-large", k:"ai", v:3.4e8, year:2018},
+ {n:"GPT-2", k:"ai", v:1.5e9, year:2019},
+ {n:"Honeybee", k:"bio", v:1e9},
+ {n:"Chinchilla", k:"ai", v:7e10, year:2022},
+ {n:"Mixtral 8×22B", k:"ai", v:1.41e11, active:3.9e10, year:2024},
+ {n:"GPT-3", k:"ai", v:1.75e11, year:2020},
+ {n:"Llama 3.1 405B", k:"ai", v:4.05e11, year:2024},
+ {n:"PaLM", k:"ai", v:5.4e11, year:2022},
+ {n:"DeepSeek-V3", k:"ai", v:6.71e11, active:3.7e10, year:2024},
+ {n:"Mouse", k:"bio", v:1e12},
+ {n:"GPT-4 (est.)", k:"ai", v:1.76e12, active:2.8e11, year:2023, est:true},
+ {n:"Cat", k:"bio", v:1e13},
+ {n:"Macaque", k:"bio", v:1e14},
+ {n:"Human", k:"bio", v:5e14},
+];
+const COL={bio:"var(--bio)", ai:"var(--ai)"};
+const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const txt=(a,s,c)=>{const e=el("text",a);if(c)e.setAttribute("class",c);e.textContent=s;return e;};
+function fmt(n){const u=[[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"k"]];for(const [d,s] of u){if(n>=d){const t=n/d;return (t>=10?Math.round(t):+t.toFixed(1))+" "+s;}}return ""+n;}
+const log10=Math.log10;
+function sLog(dmin,dmax,rmin,rmax){const a=log10(dmin),b=log10(dmax);return v=>rmin+(log10(v)-a)/(b-a)*(rmax-rmin);}
+function sLin(dmin,dmax,rmin,rmax){return v=>rmin+(v-dmin)/(dmax-dmin)*(rmax-rmin);}
+function mark(k,cx,cy,r,attrs){if(k==="bio")return el("circle",Object.assign({cx,cy,r},attrs));return el("rect",Object.assign({x:cx-r,y:cy-r,width:2*r,height:2*r,rx:1.5},attrs));}
+const TT=document.getElementById("tooltip");
+function tip(node,html){node.style.cursor="pointer";node.addEventListener("mouseenter",e=>{TT.innerHTML=html;TT.style.opacity=1;mv(e);});node.addEventListener("mousemove",mv);node.addEventListener("mouseleave",()=>TT.style.opacity=0);}
+function mv(e){let x=e.clientX+14;if(x>innerWidth-260)x=e.clientX-260;TT.style.left=x+"px";TT.style.top=(e.clientY+14)+"px";}
+function legend(id,items){const b=document.getElementById(id);b.innerHTML="";items.forEach(it=>{const sp=document.createElement("span");sp.className="lg";const sv=el("svg",{viewBox:"0 0 16 16"});sv.appendChild(mark(it.k,8,8,5,{fill:it.c||COL[it.k]}));sp.appendChild(sv);sp.appendChild(document.createTextNode(it.t));b.appendChild(sp);});}
+
+/* Chart 1: connections lollipop, sorted */
+function c1(){
+  const host=document.getElementById("c1");host.innerHTML="";
+  const rows=[...CONN].sort((a,b)=>b.v-a.v);
+  const W=880,rowH=25,mT=14,mB=30,mL=132,mR=70;const H=mT+mB+rows.length*rowH;
+  const x=sLog(1e3,1e15,mL,W-mR);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Connections by system"});
+  [1e3,1e6,1e9,1e12,1e15].forEach(t=>{svg.appendChild(el("line",{x1:x(t),y1:mT,x2:x(t),y2:H-mB,class:"gridline"}));svg.appendChild(txt({x:x(t),y:H-mB+18,"text-anchor":"middle"},fmt(t),"tick"));});
+  svg.appendChild(txt({x:(mL+W-mR)/2,y:H-6,"text-anchor":"middle"},"Learned connections — synapses (bio) / parameters (LLM), log →","axlabel-strong"));
+  rows.forEach((d,i)=>{
+    const yy=mT+i*rowH+rowH/2;
+    svg.appendChild(el("line",{x1:mL,y1:yy,x2:x(d.v),y2:yy,stroke:"var(--grid)","stroke-width":1}));
+    const m=mark(d.k,x(d.v),yy,d.k==="bio"?5.5:5,{fill:COL[d.k],stroke:"var(--surface-1)","stroke-width":1.5});
+    tip(m,`<b>${d.n}</b> · <span class="k">${d.k==="bio"?"biological":"LLM"}</span><br><span class="k">${d.k==="bio"?"synapses":"parameters"}:</span> ${fmt(d.v)}${d.active?` <span class="k">(${fmt(d.active)} active)</span>`:""}${d.est?' <span class="k">est.</span>':''}`);
+    svg.appendChild(m);
+    svg.appendChild(txt({x:mL-10,y:yy+4,"text-anchor":"end"},d.n,"datalabel"));
+    svg.appendChild(txt({x:x(d.v)+10,y:yy+4,"text-anchor":"start"},fmt(d.v),"datalabel tab"));
+  });
+  host.appendChild(svg);
+  legend("lg1",[{k:"bio",t:"Biological (synapses)"},{k:"ai",t:"LLM (parameters)"}]);
+}
+
+/* Chart 2: params over time with bio reference lines */
+function c2(){
+  const host=document.getElementById("c2");host.innerHTML="";
+  const pts=CONN.filter(d=>d.k==="ai"&&d.year);
+  const W=880,H=440,mL=64,mR=30,mT=18,mB=42;
+  const x=sLin(2017.5,2026,mL,W-mR),y=sLog(1e8,1e15,H-mB,mT);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"LLM scale over time"});
+  [2018,2020,2022,2024,2026].forEach(t=>{svg.appendChild(el("line",{x1:x(t),y1:mT,x2:x(t),y2:H-mB,class:"gridline"}));svg.appendChild(txt({x:x(t),y:H-mB+18,"text-anchor":"middle"},""+t,"tick"));});
+  [1e8,1e10,1e12,1e14].forEach(t=>{svg.appendChild(el("line",{x1:mL,y1:y(t),x2:W-mR,y2:y(t),class:"gridline"}));svg.appendChild(txt({x:mL-8,y:y(t)+3,"text-anchor":"end"},fmt(t),"tick"));});
+  // biological reference lines (labels left-aligned inside plot to avoid overflow)
+  [["Mouse ~1 T synapses",1e12],["Human ~10¹⁴–10¹⁵ synapses",5e14]].forEach(([lab,v])=>{
+    svg.appendChild(el("line",{x1:mL,y1:y(v),x2:W-mR,y2:y(v),stroke:"var(--bio)","stroke-width":1.5,"stroke-dasharray":"6 4","stroke-opacity":0.75}));
+    svg.appendChild(txt({x:mL+6,y:y(v)-5,"text-anchor":"start",fill:"var(--bio)"},lab,"datalabel"));
+  });
+  svg.appendChild(txt({x:14,y:mT-2},"Parameters ↑","axlabel-strong"));
+  // jitter points that share a year so labels don't collide
+  const byYear={};pts.forEach(d=>{(byYear[d.year]=byYear[d.year]||[]).push(d);});
+  pts.forEach(d=>{
+    const g=byYear[d.year];const idx=g.indexOf(d);const jx=g.length>1?(idx-(g.length-1)/2)*0.42:0;
+    const px=x(d.year+jx),py=y(d.v);
+    const m=mark("ai",px,py,6,{fill:"var(--ai)",stroke:"var(--surface-1)","stroke-width":2});
+    tip(m,`<b>${d.n}</b><br><span class="k">parameters:</span> ${fmt(d.v)} · <span class="k">${d.year}</span>`);svg.appendChild(m);
+    svg.appendChild(txt({x:px,y:py-11,"text-anchor":"middle"},d.n.replace(" (est.)",""),"datalabel"));
+  });
+  host.appendChild(svg);
+  legend("lg2",[{k:"ai",t:"LLM (parameters)"},{k:"bio",t:"biological synapse reference",c:"var(--bio)"}]);
+}
+
+/* Chart 3: data efficiency lollipop */
+function c3(){
+  const host=document.getElementById("c3");host.innerHTML="";
+  const D=[
+    {n:"Human (to adulthood)", k:"bio", v:1e8, note:"~10⁷–10⁸ words heard/read"},
+    {n:"GPT-3", k:"ai", v:3e11},
+    {n:"Chinchilla (compute-optimal)", k:"ai", v:1.4e12},
+    {n:"Llama 3.1 / DeepSeek-V3", k:"ai", v:1.5e13},
+  ].sort((a,b)=>a.v-b.v);
+  const W=880,rowH=40,mT=12,mB=30,mL=230,mR=70;const H=mT+mB+D.length*rowH;
+  const x=sLog(1e7,3e13,mL,W-mR);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Training data by system"});
+  [1e7,1e9,1e11,1e13].forEach(t=>{svg.appendChild(el("line",{x1:x(t),y1:mT,x2:x(t),y2:H-mB,class:"gridline"}));svg.appendChild(txt({x:x(t),y:H-mB+18,"text-anchor":"middle"},fmt(t),"tick"));});
+  svg.appendChild(txt({x:(mL+W-mR)/2,y:H-6,"text-anchor":"middle"},"Words / tokens seen to reach fluency (log →)","axlabel-strong"));
+  D.forEach((d,i)=>{
+    const yy=mT+i*rowH+rowH/2;
+    svg.appendChild(el("line",{x1:mL,y1:yy,x2:x(d.v),y2:yy,stroke:"var(--grid)","stroke-width":1}));
+    const m=mark(d.k,x(d.v),yy,6,{fill:COL[d.k],stroke:"var(--surface-1)","stroke-width":1.5});
+    tip(m,`<b>${d.n}</b><br><span class="k">data:</span> ~${fmt(d.v)} ${d.k==="bio"?"words":"tokens"}${d.note?"<br><span class='k'>"+d.note+"</span>":""}`);svg.appendChild(m);
+    svg.appendChild(txt({x:mL-10,y:yy+4,"text-anchor":"end"},d.n,"datalabel"));
+    svg.appendChild(txt({x:x(d.v)+10,y:yy+4,"text-anchor":"start"},"~"+fmt(d.v),"datalabel tab"));
+  });
+  host.appendChild(svg);
+  legend("lg3",[{k:"bio",t:"Human (words)"},{k:"ai",t:"LLM (tokens)"}]);
+}
+
+/* Chart 5: transcend vs diverge two-column */
+function c5(){
+  const host=document.getElementById("c5");host.innerHTML="";
+  const trans=["Capability scales with size as a power law","Distributed, superposed representations (no single locus)","Organization beats raw count (architecture & data > size)","Sparse / conditional computation (mixture-of-experts ↔ modular brains)"];
+  const div=["Data efficiency (~10⁵× gap: 10⁸ words vs 10¹³ tokens)","Energy efficiency (20 W lifetime vs megawatt-hour training)","Continual & one-shot learning vs frozen, many-shot weights","Embodiment & grounding; persistent internal state","Substrate: spikes + neuromodulation vs matrix multiplies"];
+  const wrap=document.createElement("div");
+  wrap.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:14px;";
+  function colBox(title,items,color){
+    const b=document.createElement("div");
+    b.style.cssText="border:1px solid var(--border);border-radius:12px;padding:12px 14px;";
+    const h=document.createElement("div");h.style.cssText=`font-weight:700;color:${color};margin-bottom:8px;font-size:0.95rem;`;h.textContent=title;b.appendChild(h);
+    const ul=document.createElement("ul");ul.style.cssText="margin:0;padding-left:18px;font-size:0.86rem;color:var(--text-secondary);line-height:1.45;";
+    items.forEach(t=>{const li=document.createElement("li");li.style.margin="5px 0";li.textContent=t;ul.appendChild(li);});
+    b.appendChild(ul);return b;
+  }
+  wrap.appendChild(colBox("✓ Transcends the divide (shared by both)",trans,"var(--bio)"));
+  wrap.appendChild(colBox("✗ Divides them (biology ≠ LLM)",div,"var(--ai)"));
+  host.appendChild(wrap);
+}
+
+function dtable(){
+  const host=document.getElementById("dtable");
+  let h="<table class='data'><thead><tr><th>System</th><th>Type</th><th>Connections</th><th>Active</th><th>Year</th></tr></thead><tbody>";
+  [...CONN].sort((a,b)=>b.v-a.v).forEach(d=>{h+=`<tr><td>${d.n}</td><td>${d.k==="bio"?"biological (synapses)":"LLM (parameters)"}</td><td>${fmt(d.v)}</td><td>${d.active?fmt(d.active):"—"}</td><td>${d.year||"—"}</td></tr>`;});
+  h+="</tbody></table>";host.innerHTML=h;
+}
+
+function setTheme(m){document.documentElement.dataset.theme=m;document.getElementById("th-light").setAttribute("aria-pressed",m==="light");document.getElementById("th-dark").setAttribute("aria-pressed",m==="dark");}
+document.getElementById("th-light").addEventListener("click",()=>setTheme("light"));
+document.getElementById("th-dark").addEventListener("click",()=>setTheme("dark"));
+c1();c2();c3();c5();dtable();
+</script>
