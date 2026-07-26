@@ -92,6 +92,12 @@ foundational discovery in this collection — the action potential, the synaptic
 basis of memory, the visual cortex, place cells — was first made in one of these
 animals.
 
+### Graphics — brain complexity as a multi-dimensional quality function
+An interactive set of [visualizations](graphics/README.md) plotting 19 animals
+across six dimensions of "complexity" (neuron counts, EQ, density, cognition) —
+built to show that the ranking reshuffles with every dimension, so there is **no
+single ladder**. Interactive page plus static PNG/SVG and the dataset.
+
 ---
 
 ## The story these documents tell, in brief

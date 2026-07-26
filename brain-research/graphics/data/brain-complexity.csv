@@ -1,0 +1,20 @@
+name,clade,brain_mass_g,total_neurons,associative_neurons,encephalization_quotient,cognition_score,neural_innovation,first_appearance_mya,uncertainty_notes
+Human,Mammal,1350,86000000000,16000000000,7.5,10,Association-cortex & language expansion,2,cortical neurons cross-verified (Herculano-Houzel)
+Chimpanzee,Mammal,400,28000000000,6200000000,2.4,8,Great-ape association cortex,18,
+Dolphin (bottlenose),Mammal,1600,37000000000,12000000000,4.1,8,Elaborated but thin cetacean cortex,55,total/associative neuron counts method-dependent and uncertain
+Elephant,Mammal,4800,257000000000,5600000000,1.9,8,Large cortex; 98% of neurons cerebellar,60,
+Rhesus macaque,Mammal,90,6400000000,1700000000,2.1,7,Primate cortical vision & PFC,25,
+Dog,Mammal,75,2250000000,530000000,1.2,6,Carnivore cortex; olfactory specialization,55,
+Cat,Mammal,30,760000000,250000000,1.0,5,Model carnivore visual cortex,55,
+Rat,Mammal,2,200000000,31000000,0.4,5,Rodent cortex; hippocampal spatial system,60,
+Mouse,Mammal,0.4,71000000,14000000,0.5,4,Lissencephalic rodent cortex,60,
+Common raven,Bird,12,1500000000,540000000,2.5,8,High-density pallium; NCL (PFC analog),80,EQ for birds not directly comparable to mammal EQ
+Pigeon,Bird,2.2,310000000,72000000,0.5,5,Avian pallium; visual/navigation systems,80,
+Zebra finch,Bird,0.6,131000000,50000000,,5,Song-control vocal-learning circuit,80,EQ not tabulated
+Octopus,Invertebrate,0.3,500000000,40000000,,7,Distributed brain; vertical-lobe learning center,300,~2/3 of neurons are in the arms; associative = central-brain estimate; not vertebrate-comparable
+Honeybee,Invertebrate,0.001,960000,,,4,Mushroom bodies; symbolic communication,300,associative subset not separately tabulated
+Fruit fly,Invertebrate,0.0002,135000,,,3,Mushroom bodies; full connectome mapped,400,brain mass approximate
+Aplysia,Invertebrate,,20000,,,2,~20k identifiable neurons; learning circuits,540,brain mass not tabulated
+C. elegans,Invertebrate,,302,,,1,Complete 302-neuron connectome,600,brain mass not applicable
+Zebrafish,Fish/Basal vertebrate,0.002,10000000,,,3,Basic vertebrate plan; whole-brain imaging,400,adult neuron count approximate
+Lamprey,Fish/Basal vertebrate,,3000000,,,2,Ancestral vertebrate plan; conserved basal ganglia,560,neuron count order-of-magnitude estimate

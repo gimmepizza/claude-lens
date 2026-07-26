@@ -1,0 +1,437 @@
+<style>
+  :root{
+    color-scheme: light;
+    --plane:#f9f9f7; --surface-1:#fcfcfb;
+    --text-primary:#0b0b0b; --text-secondary:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a; --series-5:#e87ba4;
+    --highlight:#0b0b0b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface-1:#1a1a19;
+      --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+      --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-5:#d55181;
+      --highlight:#ffffff;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface-1:#1a1a19;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+    --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-5:#d55181;
+    --highlight:#ffffff;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; }
+  .wrap{
+    font-family: system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--plane); color:var(--text-primary);
+    padding:28px 20px 64px; max-width:960px; margin:0 auto; line-height:1.5;
+  }
+  .wrap h1{ font-size:1.7rem; margin:0 0 6px; letter-spacing:-0.01em; }
+  .wrap h2{ font-size:1.15rem; margin:0 0 4px; letter-spacing:-0.01em; }
+  .sub{ color:var(--text-secondary); margin:0 0 18px; max-width:70ch; }
+  .note{ font-size:0.82rem; color:var(--text-secondary); }
+  .assump{
+    background:var(--surface-1); border:1px solid var(--border); border-radius:12px;
+    padding:14px 16px; margin:0 0 22px; font-size:0.86rem; color:var(--text-secondary);
+  }
+  .assump b{ color:var(--text-primary); }
+  .assump ul{ margin:8px 0 0; padding-left:18px; } .assump li{ margin:3px 0; }
+  .controls{ display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin:0 0 24px; }
+  .controls label{ font-size:0.85rem; color:var(--text-secondary); display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .seg{ display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .seg button{
+    font:inherit; font-size:0.8rem; border:0; background:var(--surface-1); color:var(--text-secondary);
+    padding:5px 10px; cursor:pointer; border-right:1px solid var(--border);
+  }
+  .seg button:last-child{ border-right:0; }
+  .seg button[aria-pressed="true"]{ background:var(--series-1); color:#fff; }
+  .card{
+    background:var(--surface-1); border:1px solid var(--border); border-radius:14px;
+    padding:18px 18px 12px; margin:0 0 22px;
+  }
+  .card .cap{ color:var(--text-secondary); font-size:0.86rem; margin:2px 0 12px; max-width:78ch; }
+  .card svg[role="img"]{ width:100%; height:auto; display:block; overflow:visible; }
+  .legend{ display:flex; flex-wrap:wrap; gap:6px 16px; margin:10px 2px 2px; font-size:0.8rem; color:var(--text-secondary); }
+  .legend .lg{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+  .legend .lg svg{ width:15px; height:15px; vertical-align:middle; flex:0 0 auto; }
+  .tick text, .axlabel{ fill:var(--muted); font-size:11px; }
+  .axlabel-strong{ fill:var(--text-secondary); font-size:12px; font-weight:600; }
+  .datalabel{ fill:var(--text-secondary); font-size:10.5px; }
+  .datalabel.tab{ font-variant-numeric: tabular-nums; }
+  .gridline{ stroke:var(--grid); stroke-width:1; }
+  .axisline{ stroke:var(--axis); stroke-width:1.5; }
+  #tooltip{
+    position:fixed; pointer-events:none; z-index:50; opacity:0; transition:opacity .08s;
+    background:var(--surface-1); color:var(--text-primary); border:1px solid var(--border);
+    border-radius:9px; padding:8px 10px; font-size:0.8rem; box-shadow:0 6px 24px rgba(0,0,0,0.18);
+    max-width:260px; line-height:1.4;
+  }
+  #tooltip b{ color:var(--text-primary); }
+  #tooltip .k{ color:var(--text-secondary); }
+  #tooltip .soft{ color:var(--series-2); }
+  details.table{ margin:6px 0 26px; font-size:0.82rem; color:var(--text-secondary); }
+  details.table summary{ cursor:pointer; color:var(--text-secondary); }
+  table.data{ border-collapse:collapse; margin:10px 0; width:100%; font-variant-numeric:tabular-nums; }
+  table.data th, table.data td{ border:1px solid var(--border); padding:4px 8px; text-align:right; }
+  table.data th:first-child, table.data td:first-child{ text-align:left; }
+  table.data th{ color:var(--text-secondary); font-weight:600; }
+  footer{ font-size:0.8rem; color:var(--text-secondary); border-top:1px solid var(--border); padding-top:14px; margin-top:8px; }
+  a{ color:var(--series-1); }
+</style>
+
+<div class="wrap">
+  <h1>The Progression of Brain Complexity</h1>
+  <p class="sub">Brain "complexity" is not one number. These charts treat it as a <b>multi-dimensional quality function</b> across 19 animals — and show that which animal "leads" depends entirely on which dimension you weight. There is no single ladder.</p>
+
+  <div class="assump">
+    <b>Assumptions &amp; how to read this</b>
+    <ul>
+      <li><b>Complexity is a vector.</b> Six dimensions are used: brain mass, total neurons, associative-forebrain neurons (cortex/pallium; central-brain estimate for invertebrates), encephalization quotient (EQ), neuron density, and a cognition score.</li>
+      <li><b>Numbers are best-estimates</b> from the neuroscience literature (largely Herculano-Houzel neuron counts) with real uncertainty; one species stands in for a group. Values flagged <span class="soft" style="color:var(--series-2)">◆ uncertain</span> in tooltips.</li>
+      <li><b>The cognition score (0–10) is subjective</b> — assigned from documented capacities (tool use, self-recognition, planning, social learning, communication), not a measurement. Toggle it off to see rankings on hard numbers only.</li>
+      <li><b>Invertebrate counts are not strictly comparable</b> to vertebrates (e.g. ~2/3 of octopus neurons are in its arms; "associative neurons" has no exact invertebrate equivalent).</li>
+      <li>Counts, mass, and density use <b>log scales</b> (the data spans 302 neurons to 257 billion — 9 orders of magnitude). Educational, not a definitive ranking.</li>
+    </ul>
+  </div>
+
+  <div class="controls">
+    <span class="note">Theme</span>
+    <span class="seg" role="group" aria-label="theme">
+      <button id="th-light" aria-pressed="false">Light</button>
+      <button id="th-dark" aria-pressed="false">Dark</button>
+    </span>
+    <label><input type="checkbox" id="cogToggle" checked> Include subjective cognition axis</label>
+  </div>
+
+  <div class="card">
+    <h2>1 · Every animal as a profile</h2>
+    <p class="cap">Parallel coordinates: each line is one animal traced across all dimensions (higher = more). Crossing lines mean the rankings disagree — the visual signature of "no single ladder." Hover a line to isolate it.</p>
+    <div id="c1"></div>
+    <div class="legend" id="lg1"></div>
+  </div>
+
+  <div class="card">
+    <h2>2 · The two best cognition predictors</h2>
+    <p class="cap">Associative-forebrain neurons vs encephalization quotient. Point size = total neurons. Clades cluster differently — primates and corvids reach high associative counts by different routes.</p>
+    <div id="c2"></div>
+    <div class="legend" id="lg2"></div>
+  </div>
+
+  <div class="card">
+    <h2>3 · Neurons vs brain size — and why birds break the trend</h2>
+    <p class="cap">Total neurons against brain mass (log–log). Separate trend lines for mammals and birds: birds pack far more neurons into a gram of brain, which is how a raven rivals a monkey. The human point is marked.</p>
+    <div id="c3"></div>
+    <div class="legend" id="lg3"></div>
+  </div>
+
+  <div class="card">
+    <h2>4 · The ranking reshuffles with every dimension</h2>
+    <p class="cap">The same 11 vertebrates ranked by five different quality functions. Follow any line: the elephant tops total neurons but falls on EQ and cognition; the human tops associative neurons and cognition but not mass. This is the core point.</p>
+    <div id="c4"></div>
+    <div class="legend" id="lg4"></div>
+  </div>
+
+  <div class="card">
+    <h2>5 · One composite index — and how fragile it is</h2>
+    <p class="cap">A single weighted "complexity" score (normalized dimensions combined). Switch the weighting to watch the ranking rearrange — proof that any single number is a choice, not a fact.</p>
+    <div class="controls" style="margin:2px 0 10px">
+      <span class="note">Weighting</span>
+      <span class="seg" role="group" aria-label="weighting" id="wsel">
+        <button data-w="equal" aria-pressed="true">Equal</button>
+        <button data-w="assoc" aria-pressed="false">Favor associative</button>
+        <button data-w="size" aria-pressed="false">Favor size</button>
+        <button data-w="cog" aria-pressed="false">Favor cognition</button>
+      </span>
+    </div>
+    <div id="c5"></div>
+    <div class="legend" id="lg5"></div>
+  </div>
+
+  <div class="card">
+    <h2>6 · Complexity in deep time</h2>
+    <p class="cap">When key neural innovations first appeared (approximate ages; ordered oldest → most recent, not drawn to scale). "Progression" in the only sense that is real — the accumulation of architectural inventions over ~600 million years, not a rank of living species.</p>
+    <div id="c6"></div>
+  </div>
+
+  <details class="table">
+    <summary>Show the underlying data table</summary>
+    <div id="dtable"></div>
+  </details>
+
+  <footer>
+    <b>Sources &amp; caveats.</b> Neuron counts chiefly from Herculano-Houzel and colleagues (isotropic-fractionator studies); EQ from standard comparative tables; the cognition score is the author's documented-capacity composite (subjective). Figures are order-of-magnitude best-estimates and several (notably cetacean counts and avian EQ) are method-dependent. Companion to the <i>gimmebrain</i> neuroscience reference; educational, not a definitive ranking.
+  </footer>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const DATA=[
+ {n:"Human",s:"Human",c:"Mammal",mass:1350,total:86e9,assoc:16e9,eq:7.5,cog:10,mya:2},
+ {n:"Chimpanzee",s:"Chimp",c:"Mammal",mass:400,total:28e9,assoc:6.2e9,eq:2.4,cog:8,mya:18},
+ {n:"Dolphin (bottlenose)",s:"Dolphin",c:"Mammal",mass:1600,total:37e9,assoc:12e9,eq:4.1,cog:8,mya:55,soft:["total","assoc"]},
+ {n:"Elephant",s:"Elephant",c:"Mammal",mass:4800,total:257e9,assoc:5.6e9,eq:1.9,cog:8,mya:60},
+ {n:"Rhesus macaque",s:"Macaque",c:"Mammal",mass:90,total:6.4e9,assoc:1.7e9,eq:2.1,cog:7,mya:25},
+ {n:"Dog",s:"Dog",c:"Mammal",mass:75,total:2.25e9,assoc:0.53e9,eq:1.2,cog:6,mya:55},
+ {n:"Cat",s:"Cat",c:"Mammal",mass:30,total:0.76e9,assoc:0.25e9,eq:1.0,cog:5,mya:55},
+ {n:"Rat",s:"Rat",c:"Mammal",mass:2,total:0.20e9,assoc:0.031e9,eq:0.4,cog:5,mya:60},
+ {n:"Mouse",s:"Mouse",c:"Mammal",mass:0.4,total:0.071e9,assoc:0.014e9,eq:0.5,cog:4,mya:60},
+ {n:"Common raven",s:"Raven",c:"Bird",mass:12,total:1.5e9,assoc:0.54e9,eq:2.5,cog:8,mya:80,soft:["eq"]},
+ {n:"Pigeon",s:"Pigeon",c:"Bird",mass:2.2,total:0.31e9,assoc:0.072e9,eq:0.5,cog:5,mya:80},
+ {n:"Zebra finch",s:"Finch",c:"Bird",mass:0.6,total:0.131e9,assoc:0.05e9,eq:null,cog:5,mya:80},
+ {n:"Octopus",s:"Octopus",c:"Invertebrate",mass:0.3,total:0.5e9,assoc:0.04e9,eq:null,cog:7,mya:300,soft:["assoc","total"]},
+ {n:"Honeybee",s:"Bee",c:"Invertebrate",mass:0.001,total:0.00096e9,assoc:null,eq:null,cog:4,mya:300},
+ {n:"Fruit fly",s:"Fly",c:"Invertebrate",mass:0.0002,total:0.000135e9,assoc:null,eq:null,cog:3,mya:400},
+ {n:"Aplysia",s:"Aplysia",c:"Invertebrate",mass:null,total:0.00002e9,assoc:null,eq:null,cog:2,mya:540},
+ {n:"C. elegans",s:"C.elegans",c:"Invertebrate",mass:null,total:302,assoc:null,eq:null,cog:1,mya:600},
+ {n:"Zebrafish",s:"Zebrafish",c:"Fish/Basal vertebrate",mass:0.002,total:0.010e9,assoc:null,eq:null,cog:3,mya:400},
+ {n:"Lamprey",s:"Lamprey",c:"Fish/Basal vertebrate",mass:null,total:0.003e9,assoc:null,eq:null,cog:2,mya:560},
+];
+DATA.forEach(d=> d.density = (d.mass&&d.total)? d.total/d.mass : null);
+const CLADES=["Mammal","Bird","Invertebrate","Fish/Basal vertebrate"];
+const COL={Mammal:"var(--series-1)",Bird:"var(--series-2)",Invertebrate:"var(--series-3)","Fish/Basal vertebrate":"var(--muted)"};
+const SHAPE={Mammal:"circle",Bird:"triangle",Invertebrate:"square","Fish/Basal vertebrate":"diamond"};
+
+const log10=Math.log10;
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function txt(a,s,cls){const e=el("text",a);if(cls)e.setAttribute("class",cls);e.textContent=s;return e;}
+function fmt(n){if(n==null)return "—";if(n>=1e9)return (n/1e9).toFixed(n>=1e10?0:1)+" B";if(n>=1e6)return (n/1e6).toFixed(0)+" M";if(n>=1e3)return (n/1e3).toFixed(0)+" k";return ""+n;}
+function sLog(dmin,dmax,rmin,rmax){const a=log10(dmin),b=log10(dmax);return v=>rmin+(log10(v)-a)/(b-a)*(rmax-rmin);}
+function sLin(dmin,dmax,rmin,rmax){return v=>rmin+(v-dmin)/(dmax-dmin)*(rmax-rmin);}
+function shape(sh,cx,cy,r,attrs){
+  let e;
+  if(sh==="circle")e=el("circle",Object.assign({cx,cy,r},attrs));
+  else if(sh==="square")e=el("rect",Object.assign({x:cx-r,y:cy-r,width:2*r,height:2*r,rx:1.5},attrs));
+  else if(sh==="triangle"){const p=`${cx},${cy-r*1.15} ${cx+r*1.1},${cy+r*0.85} ${cx-r*1.1},${cy+r*0.85}`;e=el("polygon",Object.assign({points:p},attrs));}
+  else {const p=`${cx},${cy-r*1.25} ${cx+r*1.2},${cy} ${cx},${cy+r*1.25} ${cx-r*1.2},${cy}`;e=el("polygon",Object.assign({points:p},attrs));}
+  return e;
+}
+const TT=document.getElementById("tooltip");
+function tipShow(html,ev){TT.innerHTML=html;TT.style.opacity=1;tipMove(ev);}
+function tipMove(ev){let x=ev.clientX+14,y=ev.clientY+14;if(x>innerWidth-260)x=ev.clientX-260;TT.style.left=x+"px";TT.style.top=y+"px";}
+function tipHide(){TT.style.opacity=0;}
+function tipRow(d){
+  const sf=(k)=>d.soft&&d.soft.includes(k)?' <span class="soft">◆</span>':'';
+  return `<b>${d.n}</b> · <span class="k">${d.c}</span><br>`+
+   `<span class="k">Total neurons:</span> ${fmt(d.total)}${sf("total")}<br>`+
+   `<span class="k">Associative:</span> ${fmt(d.assoc)}${sf("assoc")}<br>`+
+   `<span class="k">Brain mass:</span> ${d.mass!=null?d.mass+" g":"—"}<br>`+
+   `<span class="k">EQ:</span> ${d.eq!=null?d.eq:"—"}${sf("eq")} &nbsp; <span class="k">Cognition:</span> ${d.cog}/10`;
+}
+function bindTip(node,d){node.style.cursor="pointer";node.addEventListener("mouseenter",e=>tipShow(tipRow(d),e));node.addEventListener("mousemove",tipMove);node.addEventListener("mouseleave",tipHide);}
+
+let INC_COG=true;
+const DIMS=[
+ {k:"mass",label:"Brain mass",log:true},
+ {k:"total",label:"Total neurons",log:true},
+ {k:"assoc",label:"Assoc. neurons",log:true},
+ {k:"density",label:"Neuron density",log:true},
+ {k:"eq",label:"Encephalization",log:false},
+ {k:"cog",label:"Cognition*",log:false},
+];
+function dimsActive(){return DIMS.filter(d=>INC_COG||d.k!=="cog");}
+function domainOf(k,logd){const vs=DATA.map(d=>d[k]).filter(v=>v!=null&&v>0);let mn=Math.min(...vs),mx=Math.max(...vs);if(logd){mn=Math.pow(10,Math.floor(log10(mn)));mx=Math.pow(10,Math.ceil(log10(mx)));}return [mn,mx];}
+function norm(d,dim){const v=d[dim.k];if(v==null||(dim.log&&v<=0))return null;const[mn,mx]=domainOf(dim.k,dim.log);return dim.log?(log10(v)-log10(mn))/(log10(mx)-log10(mn)):(v-mn)/(mx-mn);}
+
+/* legend builder */
+function legend(id,extra){
+  const box=document.getElementById(id);box.innerHTML="";
+  CLADES.forEach(c=>{
+    const sp=document.createElement("span");sp.className="lg";
+    const sv=el("svg",{width:16,height:16,style:"overflow:visible"});
+    sv.appendChild(shape(SHAPE[c],8,8,5,{fill:COL[c],stroke:"var(--surface-1)","stroke-width":1.5}));
+    sp.appendChild(sv);sp.appendChild(document.createTextNode(c));box.appendChild(sp);
+  });
+  if(extra){const sp=document.createElement("span");sp.className="lg";sp.innerHTML=extra;box.appendChild(sp);}
+}
+
+/* ---------- Chart 1: parallel coordinates ---------- */
+function c1(){
+  const host=document.getElementById("c1");host.innerHTML="";
+  const dims=dimsActive();const W=880,H=430,mL=20,mR=20,mT=26,mB=46;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Parallel coordinates of brain dimensions"});
+  const xs=dims.map((_,i)=>mL+(W-mL-mR)*(dims.length===1?0.5:i/(dims.length-1)));
+  const y0=mT,y1=H-mB;
+  dims.forEach((dim,i)=>{
+    svg.appendChild(el("line",{x1:xs[i],y1:y0,x2:xs[i],y2:y1,class:"axisline"}));
+    svg.appendChild(txt({x:xs[i],y:y1+18,"text-anchor":"middle"},dim.label,"axlabel-strong"));
+    const[mn,mx]=domainOf(dim.k,dim.log);
+    svg.appendChild(txt({x:xs[i],y:y0-8,"text-anchor":"middle"},dim.log?fmt(mx):(""+mx),"tick"));
+    svg.appendChild(txt({x:xs[i],y:y1+32,"text-anchor":"middle"},dim.log?fmt(mn):(""+mn),"tick"));
+  });
+  const lines=[];
+  DATA.forEach(d=>{
+    const pts=[];dims.forEach((dim,i)=>{const nv=norm(d,dim);if(nv==null){pts.push(null);}else{pts.push([xs[i],y1-(y1-y0)*nv]);}});
+    // build segments skipping nulls
+    let path="";let pen=false;
+    pts.forEach(p=>{if(p==null){pen=false;}else{path+=(pen?"L":"M")+p[0]+" "+p[1]+" ";pen=true;}});
+    const pl=el("path",{d:path.trim(),fill:"none",stroke:COL[d.c],"stroke-width":1.6,"stroke-opacity":0.65,"stroke-linjoin":"round"});
+    pl.style.cursor="pointer";
+    pl.addEventListener("mouseenter",e=>{lines.forEach(l=>l.setAttribute("stroke-opacity",0.12));pl.setAttribute("stroke-opacity",1);pl.setAttribute("stroke-width",3);tipShow(tipRow(d),e);});
+    pl.addEventListener("mousemove",tipMove);
+    pl.addEventListener("mouseleave",()=>{lines.forEach(l=>{l.setAttribute("stroke-opacity",0.65);l.setAttribute("stroke-width",1.6);});tipHide();});
+    svg.appendChild(pl);lines.push(pl);
+    // marker dots
+    pts.forEach(p=>{if(p)svg.appendChild(shape(SHAPE[d.c],p[0],p[1],3,{fill:COL[d.c],stroke:"var(--surface-1)","stroke-width":1,"pointer-events":"none"}));});
+  });
+  host.appendChild(svg);legend("lg1",'<span class="k">* subjective axis</span>');
+}
+
+/* ---------- Chart 2: scatter assoc vs EQ ---------- */
+function c2(){
+  const host=document.getElementById("c2");host.innerHTML="";
+  const pts=DATA.filter(d=>d.assoc!=null&&d.eq!=null);
+  const W=880,H=440,mL=64,mR=24,mT=18,mB=48;
+  const x=sLin(0,8,mL,W-mR),y=sLog(1e7,3e10,H-mB,mT);
+  const rS=sLog(1e6,3e11,5,17);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Associative neurons vs EQ"});
+  [0,2,4,6,8].forEach(t=>{svg.appendChild(el("line",{x1:x(t),y1:mT,x2:x(t),y2:H-mB,class:"gridline"}));svg.appendChild(txt({x:x(t),y:H-mB+18,"text-anchor":"middle"},""+t,"tick"));});
+  [1e7,1e8,1e9,1e10].forEach(t=>{svg.appendChild(el("line",{x1:mL,y1:y(t),x2:W-mR,y2:y(t),class:"gridline"}));svg.appendChild(txt({x:mL-8,y:y(t)+3,"text-anchor":"end"},fmt(t),"tick"));});
+  svg.appendChild(txt({x:(mL+W-mR)/2,y:H-10,"text-anchor":"middle"},"Encephalization quotient (EQ)  →","axlabel-strong"));
+  svg.appendChild(txt({x:16,y:mT+4,"text-anchor":"start"},"Associative neurons ↑","axlabel-strong"));
+  pts.forEach(d=>{
+    const m=shape(SHAPE[d.c],x(d.eq),y(d.assoc),rS(d.total),{fill:COL[d.c],"fill-opacity":0.8,stroke:"var(--surface-1)","stroke-width":2});
+    bindTip(m,d);svg.appendChild(m);
+    svg.appendChild(txt({x:x(d.eq),y:y(d.assoc)-rS(d.total)-4,"text-anchor":"middle","pointer-events":"none"},d.s,"datalabel"));
+  });
+  host.appendChild(svg);legend("lg2",'<span class="k">size = total neurons</span>');
+}
+
+/* ---------- Chart 3: scaling total vs mass ---------- */
+function c3(){
+  const host=document.getElementById("c3");host.innerHTML="";
+  const pts=DATA.filter(d=>d.mass!=null&&d.total!=null);
+  const W=880,H=440,mL=60,mR=24,mT=18,mB=48;
+  const x=sLog(1e-4,1e4,mL,W-mR),y=sLog(1e2,1e12,H-mB,mT);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Total neurons vs brain mass"});
+  [-4,-2,0,2,4].forEach(p=>{const t=Math.pow(10,p);svg.appendChild(el("line",{x1:x(t),y1:mT,x2:x(t),y2:H-mB,class:"gridline"}));svg.appendChild(txt({x:x(t),y:H-mB+18,"text-anchor":"middle"},p<0?`10^${p}`:fmt(t)+" g","tick"));});
+  [1e2,1e4,1e6,1e8,1e10,1e12].forEach(t=>{svg.appendChild(el("line",{x1:mL,y1:y(t),x2:W-mR,y2:y(t),class:"gridline"}));svg.appendChild(txt({x:mL-8,y:y(t)+3,"text-anchor":"end"},fmt(t),"tick"));});
+  svg.appendChild(txt({x:(mL+W-mR)/2,y:H-10,"text-anchor":"middle"},"Brain mass (log)  →","axlabel-strong"));
+  const c3my=(mT+H-mB)/2;
+  svg.appendChild(txt({x:16,y:c3my,"text-anchor":"middle",transform:`rotate(-90 16 ${c3my})`},"Total neurons ↑","axlabel-strong"));
+  // trend lines (log-log least squares) for mammals and birds
+  function fit(cl){const g=pts.filter(d=>d.c===cl);const X=g.map(d=>log10(d.mass)),Y=g.map(d=>log10(d.total));const n=X.length;const mx=X.reduce((a,b)=>a+b)/n,my=Y.reduce((a,b)=>a+b)/n;let num=0,den=0;X.forEach((xi,i)=>{num+=(xi-mx)*(Y[i]-my);den+=(xi-mx)**2;});const slope=num/den,int=my-slope*mx;const xr=[Math.min(...X),Math.max(...X)];return {slope,int,xr};}
+  [["Mammal","var(--series-1)"],["Bird","var(--series-2)"]].forEach(([cl,co])=>{const f=fit(cl);const p1=[Math.pow(10,f.xr[0]),Math.pow(10,f.slope*f.xr[0]+f.int)],p2=[Math.pow(10,f.xr[1]),Math.pow(10,f.slope*f.xr[1]+f.int)];svg.appendChild(el("line",{x1:x(p1[0]),y1:y(p1[1]),x2:x(p2[0]),y2:y(p2[1]),stroke:co,"stroke-width":2,"stroke-dasharray":"6 4","stroke-opacity":0.7}));});
+  pts.forEach(d=>{
+    const isH=d.n==="Human";
+    const m=shape(SHAPE[d.c],x(d.mass),y(d.total),isH?8:6,{fill:COL[d.c],"fill-opacity":0.85,stroke:isH?"var(--highlight)":"var(--surface-1)","stroke-width":isH?2.5:2});
+    bindTip(m,d);svg.appendChild(m);
+    if(["Human","Elephant","Raven","C.elegans","Bee","Fly","Octopus","Mouse"].includes(d.s))
+      svg.appendChild(txt({x:x(d.mass),y:y(d.total)-10,"text-anchor":"middle","pointer-events":"none"},d.s,"datalabel"));
+  });
+  host.appendChild(svg);legend("lg3",'<span class="k">dashed = per-clade trend</span>');
+}
+
+/* ---------- Chart 4: bump / rank reshuffle ---------- */
+function c4(){
+  const host=document.getElementById("c4");host.innerHTML="";
+  const funcs=[["mass","Brain mass"],["total","Total neurons"],["assoc","Assoc neurons"],["eq","EQ"],["cog","Cognition"]];
+  const set=DATA.filter(d=>["mass","total","assoc","eq","cog"].every(k=>d[k]!=null));
+  const ranks={};funcs.forEach(([k])=>{const sorted=[...set].sort((a,b)=>b[k]-a[k]);ranks[k]={};sorted.forEach((d,i)=>ranks[k][d.n]=i+1);});
+  const W=880,H=470,mL=95,mR=95,mT=24,mB=30;
+  const xs=funcs.map((_,i)=>mL+(W-mL-mR)*i/(funcs.length-1));
+  const y=sLin(1,set.length,mT,H-mB);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Rank reshuffle across quality functions"});
+  funcs.forEach(([k,lab],i)=>{svg.appendChild(el("line",{x1:xs[i],y1:mT-6,x2:xs[i],y2:H-mB,class:"gridline"}));svg.appendChild(txt({x:xs[i],y:H-mB+18,"text-anchor":"middle"},lab,"axlabel-strong"));});
+  const paths=[];
+  set.forEach(d=>{
+    let path="";funcs.forEach(([k],i)=>{path+=(i?"L":"M")+xs[i]+" "+y(ranks[k][d.n])+" ";});
+    const pl=el("path",{d:path.trim(),fill:"none",stroke:COL[d.c],"stroke-width":2,"stroke-opacity":0.6,"stroke-linecap":"round","stroke-linejoin":"round"});
+    pl.style.cursor="pointer";
+    pl.addEventListener("mouseenter",e=>{paths.forEach(p=>p.setAttribute("stroke-opacity",0.1));pl.setAttribute("stroke-opacity",1);pl.setAttribute("stroke-width",3.5);tipShow(tipRow(d),e);});
+    pl.addEventListener("mousemove",tipMove);
+    pl.addEventListener("mouseleave",()=>{paths.forEach(p=>{p.setAttribute("stroke-opacity",0.6);p.setAttribute("stroke-width",2);});tipHide();});
+    svg.appendChild(pl);paths.push(pl);
+    funcs.forEach(([k],i)=>svg.appendChild(shape(SHAPE[d.c],xs[i],y(ranks[k][d.n]),3.5,{fill:COL[d.c],stroke:"var(--surface-1)","stroke-width":1.5,"pointer-events":"none"})));
+    svg.appendChild(txt({x:xs[0]-10,y:y(ranks.mass[d.n])+3,"text-anchor":"end","pointer-events":"none"},d.s,"datalabel"));
+    svg.appendChild(txt({x:xs[funcs.length-1]+10,y:y(ranks.cog[d.n])+3,"text-anchor":"start","pointer-events":"none"},d.s,"datalabel"));
+  });
+  svg.appendChild(txt({x:mL-10,y:mT-10,"text-anchor":"end"},"rank 1 (top)","tick"));
+  host.appendChild(svg);legend("lg4",'<span class="k">11 vertebrates with complete data</span>');
+}
+
+/* ---------- Chart 5: composite index ---------- */
+let WEIGHTS="equal";
+const WSETS={
+  equal:{mass:1,total:1,assoc:1,density:1,eq:1,cog:1},
+  assoc:{mass:0.4,total:0.6,assoc:3,density:0.4,eq:1.2,cog:1},
+  size:{mass:3,total:3,assoc:1,density:0.3,eq:0.3,cog:0.4},
+  cog:{mass:0.4,total:0.5,assoc:1,density:0.4,eq:0.8,cog:3},
+};
+function score(d){
+  const w=WSETS[WEIGHTS];let num=0,den=0;
+  dimsActive().forEach(dim=>{const nv=norm(d,dim);if(nv!=null){num+=w[dim.k]*nv;den+=w[dim.k];}});
+  return den?num/den:0;
+}
+function c5(){
+  const host=document.getElementById("c5");host.innerHTML="";
+  const rows=DATA.map(d=>({d,v:score(d)})).sort((a,b)=>b.v-a.v);
+  const W=880,rowH=20,mT=8,mB=10,mL=95,mR=54;const H=mT+mB+rows.length*rowH;
+  const x=sLin(0,1,mL,W-mR);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Composite complexity index"});
+  [0,0.25,0.5,0.75,1].forEach(t=>{svg.appendChild(el("line",{x1:x(t),y1:mT,x2:x(t),y2:H-mB,class:"gridline"}));});
+  rows.forEach((r,i)=>{
+    const yy=mT+i*rowH+rowH/2;const w=x(r.v)-x(0);
+    const bar=el("rect",{x:x(0),y:yy-6,width:Math.max(w,1),height:12,rx:4,fill:COL[r.d.c],"fill-opacity":0.9});
+    bindTip(bar,r.d);svg.appendChild(bar);
+    svg.appendChild(txt({x:x(0)-8,y:yy+3,"text-anchor":"end","pointer-events":"none"},r.d.s,"datalabel"));
+    svg.appendChild(txt({x:x(r.v)+6,y:yy+3,"text-anchor":"start","pointer-events":"none"},r.v.toFixed(2),"datalabel tab"));
+  });
+  host.appendChild(svg);legend("lg5",'<span class="k">score = weighted mean of normalized dimensions</span>');
+}
+
+/* ---------- Chart 6: evolutionary timeline ---------- */
+function c6(){
+  const host=document.getElementById("c6");host.innerHTML="";
+  const M=[
+    {t:"~600 Mya",l:"Nerve nets → nerve cords",dsub:"first centralization of the nervous system"},
+    {t:"~560 Mya",l:"Vertebrate brain plan + basal ganglia",dsub:"the action-selection circuit, traced via the lamprey"},
+    {t:"~540 Mya",l:"Molluscan / annelid ganglia",dsub:"the lineage of Aplysia's learning circuits"},
+    {t:"~400 Mya",l:"Insect mushroom bodies",dsub:"dedicated learning centers (fly, bee)"},
+    {t:"~300 Mya",l:"Cephalopod complex brain",dsub:"the octopus's independently-evolved mind"},
+    {t:"~200 Mya",l:"Mammalian six-layer neocortex",dsub:"the layered cortex our own brain elaborates"},
+    {t:"~150 Mya",l:"Avian pallium (cortex-like, unlayered)",dsub:"the substrate corvid intelligence later exploits"},
+    {t:"~65 Mya",l:"Primate visual & prefrontal expansion",dsub:"association cortex begins to enlarge"},
+    {t:"~2 Mya",l:"Human association cortex & language",dsub:"cumulative culture and symbolic language"},
+  ];
+  const W=880,rowH=54,mT=18,mB=26,xLine=150;
+  const H=mT+mB+M.length*rowH;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Timeline of neural innovations, oldest to most recent"});
+  svg.appendChild(el("line",{x1:xLine,y1:mT+6,x2:xLine,y2:mT+(M.length-1)*rowH+rowH/2,class:"axisline"}));
+  svg.appendChild(txt({x:xLine,y:mT-2,"text-anchor":"middle"},"older ↑","tick"));
+  svg.appendChild(txt({x:xLine,y:H-8,"text-anchor":"middle"},"↓ more recent","tick"));
+  M.forEach((m,i)=>{
+    const yy=mT+i*rowH+rowH/2;
+    svg.appendChild(txt({x:xLine-18,y:yy+4,"text-anchor":"end"},m.t,"datalabel tab"));
+    svg.appendChild(shape("circle",xLine,yy,5.5,{fill:"var(--series-1)",stroke:"var(--surface-1)","stroke-width":2}));
+    const tn=txt({x:xLine+18,y:yy-2},m.l,"datalabel");tn.setAttribute("font-weight","600");tn.setAttribute("font-size","12.5px");svg.appendChild(tn);
+    svg.appendChild(txt({x:xLine+18,y:yy+15},m.dsub,"tick"));
+  });
+  host.appendChild(svg);
+}
+
+/* ---------- data table ---------- */
+function dtable(){
+  const host=document.getElementById("dtable");
+  const cols=[["n","Animal"],["c","Clade"],["mass","Mass (g)"],["total","Total neurons"],["assoc","Assoc neurons"],["eq","EQ"],["cog","Cognition"]];
+  let h="<table class='data'><thead><tr>"+cols.map(c=>`<th>${c[1]}</th>`).join("")+"</tr></thead><tbody>";
+  DATA.forEach(d=>{h+="<tr>"+cols.map(c=>{let v=d[c[0]];if(["total","assoc"].includes(c[0]))v=fmt(v);if(v==null)v="—";return `<td>${v}</td>`;}).join("")+"</tr>";});
+  h+="</tbody></table>";host.innerHTML=h;
+}
+
+function renderAll(){c1();c2();c3();c4();c5();c6();dtable();}
+/* controls */
+document.getElementById("cogToggle").addEventListener("change",e=>{INC_COG=e.target.checked;c1();c5();});
+document.querySelectorAll("#wsel button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("#wsel button").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");WEIGHTS=b.dataset.w;c5();}));
+function setTheme(m){const r=document.documentElement;if(m)r.dataset.theme=m;document.getElementById("th-light").setAttribute("aria-pressed",m==="light");document.getElementById("th-dark").setAttribute("aria-pressed",m==="dark");}
+document.getElementById("th-light").addEventListener("click",()=>setTheme("light"));
+document.getElementById("th-dark").addEventListener("click",()=>setTheme("dark"));
+renderAll();
+</script>
