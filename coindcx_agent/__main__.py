@@ -1,4 +1,4 @@
 """Allow running as: python -m coindcx_agent"""
-from .agent import main
+from .cli import main
 
 main()

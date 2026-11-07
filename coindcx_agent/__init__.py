@@ -1,2 +1,2 @@
-"""CoinDCX Quant Algo Trading Agent"""
-__version__ = "1.0.0"
+"""CoinDCX algo trading agent."""
+__version__ = "2.0.0"

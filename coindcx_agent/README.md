@@ -1,128 +1,130 @@
-# CoinDCX Quant Algo Trading Agent
+# CoinDCX algo trading agent (v2)
 
-A Python-based quantitative algorithmic trading agent for the CoinDCX cryptocurrency exchange. Supports multiple technical analysis strategies, risk management, paper trading, and live order execution via the CoinDCX REST API.
+A long-only spot trading bot for CoinDCX with an honest backtester. It is built so
+that **what you backtest is exactly what you trade**, and so that a mistake costs
+as little as possible.
 
-## Features
+> Crypto trading can lose you money. Backtests are not predictions. Paper-trade
+> first, then go live with a small `CAPITAL_LIMIT`. Tax figures are rough
+> estimates under India's VDA rules, not tax advice.
 
-- **6 Trading Strategies**: EMA Crossover, RSI, Bollinger Bands, VWAP, MACD, and a Composite multi-signal strategy
-- **Full CoinDCX API Integration**: HMAC-SHA256 authenticated REST API client for orders, balances, market data
-- **Risk Management**: Position sizing, stop-loss/take-profit, daily loss limits, trade frequency limits
-- **Paper Trading**: Simulated execution for strategy testing without risking real funds
-- **Live Trading**: Execute real orders on CoinDCX with proper authentication
-- **Technical Indicators**: EMA, SMA, RSI, Bollinger Bands, MACD, VWAP, ATR, Stochastic RSI, OBV
-- **Trade Logging**: All trades logged to JSON for analysis
-- **CLI Interface**: Full-featured command-line interface
-
-## Setup
+## Quick start
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+pip install -r coindcx_agent/requirements.txt
+cp coindcx_agent/.env.example .env      # API keys only needed for balance/live
 
-# Configure API keys (copy and edit)
-cp .env.example .env
-# Edit .env with your CoinDCX API key and secret
+python -m coindcx_agent markets --search INR          # what's tradable, by volume
+python -m coindcx_agent compare -m BTCINR -i 1d --walk-forward
+python -m coindcx_agent backtest -m BTCINR -i 1d -s ema_cross --report report.html
+python -m coindcx_agent signal -m BTCINR               # what would it do right now?
+python -m coindcx_agent paper -m BTCINR                # paper trade, live prices
+python -m coindcx_agent status -m BTCINR               # equity, fills, events
 ```
 
-## Usage
+Going live needs three deliberate steps: API keys in `.env`,
+`LIVE_TRADING_CONFIRM=I_ACCEPT_THE_RISK` in the environment, and typing the market
+name at the prompt.
 
 ```bash
-# Run a single analysis (paper mode by default)
-python -m coindcx_agent analyze -m BTCINR -s ema_crossover
-
-# Run continuous trading loop
-python -m coindcx_agent run -m BTCINR -s composite -i 60
-
-# View ticker data
-python -m coindcx_agent ticker -m BTCINR
-
-# View order book
-python -m coindcx_agent orderbook -m BTCINR
-
-# List available markets
-python -m coindcx_agent markets --search BTC
-
-# View portfolio summary
-python -m coindcx_agent portfolio -m BTCINR
-
-# View trade history
-python -m coindcx_agent trades
-
-# Check balances (live mode)
-python -m coindcx_agent balance --live
-
-# Live trading (requires API keys in .env)
-python -m coindcx_agent run -m BTCINR -s composite --live -i 120
+python -m coindcx_agent live -m BTCINR --capital-limit 5000 --max-order-value 5000
 ```
+
+## What the backtests say (Nov 2026, daily candles, ~3 years)
+
+Run `compare --walk-forward` yourself; results move as new data arrives.
+
+- **Costs decide everything.** At the default 0.5% fee + GST + 0.3% spread, a round
+  trip costs ~1.6%. At a 0.1% fee most trend strategies beat buy & hold
+  out-of-sample on BTCINR; at 0.5% only `ema_cross`/`donchian` do. **Check your fee tier.**
+- **Decide on daily candles.** Multi-day signals evaluated hourly whipsaw and bleed
+  fees. Strategies therefore decide on completed daily candles by default, even when
+  the bot runs on 1h candles (which then only speed up stops and kill-switch checks).
+- **Trend filters mostly cut drawdowns.** Typical max drawdown -25…-35% vs -47…-74%
+  for holding. They do not reliably beat holding on raw return, and results differ a
+  lot between coins (EMA cross: great on BTC/ETH INR, poor on SOL).
+- **Mean reversion (RSI, Bollinger) doesn't survive these costs.** Kept for research.
+- **Tight stops hurt.** Price stops sized from hourly ATR were hit by noise on almost
+  every trade. Stops are off by default; the strategy exits act as stops, and a
+  drawdown kill switch backs them up. Enable with `--stop 5` (daily ATRs) if you want one.
+- **Indian tax changes the picture.** Each profitable sale is taxed at 30% + cess with
+  no loss set-off, while buy & hold is only taxed when sold. Compare the
+  "after tax" column, not just "return".
+
+## How it works
+
+| Module | Job |
+|---|---|
+| `exchange.py` | REST client: HMAC signing, timeouts, retries with backoff, rate limit; never blind-retries order creation. `MarketRules` rounds quantity/price to exchange precision and checks minimum order value. |
+| `data.py` | Paginated candle history with a CSV cache; drops the still-forming candle. |
+| `indicators.py` | EMA, RSI, ATR, Bollinger, MACD, Donchian, ADX, realized vol, daily ATR. |
+| `strategies.py` | Each strategy returns a target exposure in [0, 1] for every bar. |
+| `risk.py` | Sizing, optional ATR trailing stop, cooldown, daily loss limit, drawdown kill switch. Shared by backtest and live. |
+| `backtest.py` | Bar-by-bar simulator + walk-forward optimiser. |
+| `brokers.py` | `PaperBroker` (fills at live bid/ask + slippage + fees) and `LiveBroker`. |
+| `engine.py` | The trading loop. |
+| `state.py` | SQLite: positions, fills, equity, risk state, events. Survives restarts. |
+| `report.py` | Self-contained HTML report (equity and drawdown vs buy & hold). |
+
+### Backtest rules
+
+- A signal from bar *t*'s close is filled at bar *t+1*'s open.
+- Every fill pays half the spread + slippage + fee + 18% GST on the fee.
+- Stops are checked against the bar's low; a gap through the stop fills at the open.
+- 1% TDS on INR sales is reported (it's creditable); estimated tax = 31.2% of each
+  sale's gain.
+- Walk-forward: parameters are re-chosen on the previous 365 days and traded on the
+  next 90 unseen days; only those unseen periods are stitched into the result.
+
+### Live safety
+
+- **Your existing coins are never touched.** The bot tracks the quantity *it* bought
+  and only ever sells that.
+- `CAPITAL_LIMIT` caps how much quote currency the bot may use (default ₹5,000).
+- `MAX_ORDER_VALUE` caps any single order.
+- Orders are marketable limit orders at the best bid/ask (price-protected); unfilled
+  remainders are cancelled after `order_timeout_s`. A failed create is looked up by
+  client order ID instead of being resent, so it can't double-buy.
+- Kill switches: drawdown ≥ `MAX_DRAWDOWN_PCT` flattens and halts until you run
+  `reset-halt`; a file named `STOP` in the working directory stops the loop;
+  `DAILY_LOSS_LIMIT_PCT` blocks new buying for the rest of the IST day.
+- On restart the bot reloads its state and does not re-trade a candle it already acted on.
 
 ## Strategies
 
-| Strategy | Type | Description |
+| Name | Type | Idea |
 |---|---|---|
-| `ema_crossover` | Trend Following | Buy on fast EMA crossing above slow EMA, sell on cross below |
-| `rsi` | Mean Reversion | Buy when RSI < 30 (oversold), sell when RSI > 70 (overbought) |
-| `bollinger_bands` | Mean Reversion | Buy at lower band, sell at upper band |
-| `vwap` | Value | Buy below VWAP, sell above VWAP |
-| `macd` | Momentum | Buy/sell on MACD-signal line crossovers |
-| `composite` | Multi-Signal | Combines all strategies; trades only when 3+ agree |
+| `ensemble` (default) | trend | Average of `trend_vol`, `donchian`, `ema_cross` |
+| `ema_cross` | trend | Fast EMA above slow EMA, with ADX trend-strength filter |
+| `donchian` | trend | Buy an N-day high breakout, exit at an M-day low |
+| `trend_vol` | trend | Multi-horizon momentum, volatility-targeted size, stepped exposure |
+| `macd` | momentum | MACD above signal and above zero |
+| `rsi_dip` | mean reversion | Buy RSI dips inside an uptrend |
+| `bollinger` | mean reversion | Buy below the lower band, exit at the middle |
 
-## Configuration
+Override parameters with `--params '{"entry_days": 40, "exit_days": 20}'`.
 
-Environment variables (`.env`):
+## Configuration (`.env`)
 
-| Variable | Default | Description |
-|---|---|---|
-| `COINDCX_API_KEY` | — | Your CoinDCX API key |
-| `COINDCX_API_SECRET` | — | Your CoinDCX API secret |
-| `TRADING_MARKET` | `BTCINR` | Default trading market |
-| `DEFAULT_STRATEGY` | `ema_crossover` | Default strategy |
-| `MAX_POSITION_SIZE_PCT` | `5.0` | Max position as % of portfolio |
-| `MAX_LOSS_PCT` | `2.0` | Max loss per trade (%) |
-| `PAPER_TRADING` | `true` | Paper trading mode |
+See `.env.example`. Every value can also be set with a CLI flag (`--help` on any command).
 
-## Project Structure
+## Running it 24/7
 
-```
-coindcx_agent/
-├── __init__.py          # Package init
-├── __main__.py          # Entry point for python -m
-├── agent.py             # CLI agent with all commands
-├── api_client.py        # CoinDCX REST API client (HMAC auth)
-├── config.py            # Configuration management
-├── market_data.py       # Market data fetching & processing
-├── risk_manager.py      # Risk management & position sizing
-├── trading_engine.py    # Core trading engine
-├── strategies/
-│   ├── base.py              # Strategy interface & signal types
-│   ├── ema_crossover.py     # EMA Crossover strategy
-│   ├── rsi_strategy.py      # RSI strategy
-│   ├── bollinger_bands.py   # Bollinger Bands strategy
-│   ├── vwap_strategy.py     # VWAP strategy
-│   ├── macd_strategy.py     # MACD strategy
-│   └── composite.py         # Multi-strategy composite
-├── utils/
-│   └── indicators.py        # Technical indicator calculations
-├── .env.example         # Environment template
-├── requirements.txt     # Python dependencies
-└── README.md            # This file
+The paper/live loop is a single process. Run it under `tmux`, `systemd` or a small VM,
+for example:
+
+```bash
+nohup python -m coindcx_agent paper -m BTCINR > bot.log 2>&1 &
+touch STOP     # graceful stop at the next check
 ```
 
-## API Endpoints Used
+## Tests
 
-**Public (no auth):**
-- `GET /exchange/ticker` — Market ticker
-- `GET /exchange/v1/markets_details` — Market info
-- `GET /market_data/candles` — OHLCV candles
-- `GET /market_data/orderbook` — Order book
-- `GET /market_data/trade_history` — Recent trades
+```bash
+python -m pytest coindcx_agent/tests -q
+```
 
-**Private (HMAC-SHA256 auth):**
-- `POST /exchange/v1/users/balances` — Account balances
-- `POST /exchange/v1/orders/create` — Place order
-- `POST /exchange/v1/orders/cancel` — Cancel order
-- `POST /exchange/v1/orders/active_orders` — Active orders
-- `POST /exchange/v1/orders/trade_history` — Trade history
-
-## Risk Disclaimer
-
-This software is for educational and research purposes. Cryptocurrency trading involves substantial risk of loss. Always start with paper trading and never risk more than you can afford to lose.
+They cover exchange rounding and signing, candle parsing, lookahead (every strategy's
+signal at bar k is identical with or without future bars), backtest accounting
+against a vectorized reference, risk rules, and the engine and brokers against a fake
+exchange (including "never sells pre-existing coins").
