@@ -28,7 +28,10 @@ class RiskState:
     entry_price: float = 0.0
     stop_price: float = 0.0
     highest: float = 0.0
+    take_profit: float = 0.0
+    bars_held: int = 0
     cooldown: int = 0
+    need_rearm: bool = False  # after a time/TP exit, wait for the signal to reset
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -42,7 +45,10 @@ class RiskManager:
     def __init__(self, cfg: RiskConfig, state: RiskState | None = None, bar_seconds: int = 3600):
         self.cfg = cfg
         self.s = state or RiskState()
-        self.cooldown_bars = max(0, int(round(cfg.cooldown_hours * 3600 / bar_seconds)))
+        to_bars = lambda h: max(0, int(round(h * 3600 / bar_seconds)))  # noqa: E731
+        self.cooldown_bars = to_bars(cfg.cooldown_hours)
+        self.min_hold_bars = to_bars(cfg.min_hold_hours)
+        self.max_hold_bars = to_bars(cfg.max_hold_hours) if cfg.max_hold_hours > 0 else 0
 
     # ── equity guards ──────────────────────────────────────────────
 
@@ -74,13 +80,17 @@ class RiskManager:
     def on_entry(self, price: float, atr: float) -> None:
         s = self.s
         s.entry_price = s.highest = price
+        s.bars_held = 0
         s.stop_price = price - self.cfg.stop_atr_mult * atr if self.uses_stop and atr > 0 else 0.0
+        tp = self.cfg.take_profit_atr_mult
+        s.take_profit = price + tp * atr if tp > 0 and atr > 0 else 0.0
 
     def on_bar(self, high: float, atr: float) -> None:
         """Ratchet the trailing stop after a bar closes while in a position."""
         s = self.s
         if not s.entry_price:
             return
+        s.bars_held += 1
         s.highest = max(s.highest, high)
         if self.uses_stop and self.cfg.trailing_stop and atr > 0:
             s.stop_price = max(s.stop_price, s.highest - self.cfg.stop_atr_mult * atr)
@@ -88,11 +98,20 @@ class RiskManager:
     def stop_triggered(self, low: float) -> bool:
         return bool(self.s.entry_price and self.s.stop_price and low <= self.s.stop_price)
 
-    def on_exit(self, stopped: bool) -> None:
+    def take_profit_triggered(self, high: float) -> bool:
+        return bool(self.s.entry_price and self.s.take_profit and high >= self.s.take_profit)
+
+    def time_exit_due(self) -> bool:
+        return bool(self.s.entry_price and self.max_hold_bars and self.s.bars_held >= self.max_hold_bars)
+
+    def on_exit(self, stopped: bool = False, reason: str = "") -> None:
         s = self.s
-        s.entry_price = s.stop_price = s.highest = 0.0
-        if stopped:
+        s.entry_price = s.stop_price = s.highest = s.take_profit = 0.0
+        s.bars_held = 0
+        if stopped or reason == "stop":
             s.cooldown = self.cooldown_bars
+        if reason in ("time", "take_profit"):
+            s.need_rearm = True
 
     def tick(self) -> None:
         """Call once per closed bar."""
@@ -115,9 +134,14 @@ class RiskManager:
         if s.halted:
             return 0.0
         want = max(0.0, min(1.0, target)) * self.max_fraction(price, atr)
+        if s.need_rearm and target <= 1e-9:
+            s.need_rearm = False
+        in_pos = current > 1e-9
+        if in_pos and want < current and s.entry_price and s.bars_held < self.min_hold_bars:
+            return current  # minimum holding time; protective stops still apply
         if want <= 1e-9:
             return 0.0
-        if current <= 1e-9 and s.cooldown > 0:
+        if not in_pos and (s.cooldown > 0 or s.need_rearm):
             return 0.0
         if s.day_halted and want > current:
             return current  # may reduce, may not add

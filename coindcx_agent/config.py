@@ -51,11 +51,19 @@ class CostModel:
     tds_pct: float = field(default_factory=lambda: _env("TDS_PCT", 1.0))
     # India: flat 30% + 4% cess on VDA gains; losses cannot be set off.
     tax_rate_pct: float = field(default_factory=lambda: _env("TAX_RATE_PCT", 31.2))
+    # Entries as resting limit orders at the bid (maker) instead of crossing the spread.
+    # A maker entry only fills if price trades down to it within `maker_wait_bars`.
+    maker_entries: bool = field(default_factory=lambda: _env("MAKER_ENTRIES", False))
+    maker_fee_pct: float = field(default_factory=lambda: _env("MAKER_FEE_PCT", 0.5))
 
     @property
     def effective_fee(self) -> float:
-        """Fee per fill as a fraction, GST included."""
+        """Taker fee per fill as a fraction, GST included."""
         return self.fee_pct / 100 * (1 + self.gst_on_fee_pct / 100)
+
+    @property
+    def effective_maker_fee(self) -> float:
+        return self.maker_fee_pct / 100 * (1 + self.gst_on_fee_pct / 100)
 
 
 @dataclass
@@ -66,8 +74,17 @@ class RiskConfig:
     max_position_pct: float = field(default_factory=lambda: _env("MAX_POSITION_PCT", 100.0))
     # Hard cap on any single order value in quote currency (live safety net).
     max_order_value: float = field(default_factory=lambda: _env("MAX_ORDER_VALUE", 10000.0))
-    # Stops use the ATR of *daily* candles over this many days, whatever the trading interval.
+    # "daily": stops use the ATR of daily candles over `atr_days` (swing trading).
+    # "bar": stops use the ATR of the trading candles over `atr_bars` (intraday).
+    stop_atr_source: str = field(default_factory=lambda: _env("STOP_ATR_SOURCE", "daily"))
     atr_days: int = 14
+    atr_bars: int = 14
+    # Take profit at entry + N ATRs (0 = off).
+    take_profit_atr_mult: float = field(default_factory=lambda: _env("TAKE_PROFIT_ATR_MULT", 0.0))
+    # Holding horizon. min: the strategy may not exit sooner (stops still fire).
+    # max: forced time exit; the signal must reset before re-entering. 0 = off.
+    min_hold_hours: float = field(default_factory=lambda: _env("MIN_HOLD_HOURS", 0.0))
+    max_hold_hours: float = field(default_factory=lambda: _env("MAX_HOLD_HOURS", 0.0))
     stop_atr_mult: float = field(default_factory=lambda: _env("STOP_ATR_MULT", 0.0))
     trailing_stop: bool = True
     daily_loss_limit_pct: float = field(default_factory=lambda: _env("DAILY_LOSS_LIMIT_PCT", 3.0))
@@ -83,7 +100,8 @@ class RiskConfig:
 class TradingConfig:
     market: str = field(default_factory=lambda: _env("TRADING_MARKET", "BTCINR"))
     strategy: str = field(default_factory=lambda: _env("STRATEGY", "ensemble"))
-    interval: str = field(default_factory=lambda: _env("CANDLE_INTERVAL", "1h"))
+    # Empty = the strategy's own default (1h for swing, 15m for intraday).
+    interval: str = field(default_factory=lambda: _env("CANDLE_INTERVAL", ""))
     lookback: int = 400
     paper_starting_cash: float = field(default_factory=lambda: _env("PAPER_CASH", 100000.0))
     # Live: most quote currency (e.g. INR) the bot may put to work, counting its open
@@ -91,6 +109,8 @@ class TradingConfig:
     capital_limit: float = field(default_factory=lambda: _env("CAPITAL_LIMIT", 5000.0))
     # Seconds a live limit order may rest before it is cancelled and re-priced.
     order_timeout_s: int = 20
+    # Seconds a maker (resting bid) entry waits for a fill before it is cancelled.
+    maker_wait_s: int = 300
     # Seconds between stop checks inside a bar.
     poll_s: int = 30
     state_db: str = field(default_factory=lambda: _env("STATE_DB", "coindcx_state.sqlite"))

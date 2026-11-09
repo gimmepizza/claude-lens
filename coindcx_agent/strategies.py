@@ -54,6 +54,15 @@ class Strategy:
         """Bars per day."""
         return 86400 / INTERVAL_SECONDS[self.interval]
 
+    # Defaults applied by the CLI unless overridden: preferred candle interval and
+    # risk settings that define the strategy's holding horizon.
+    default_interval: ClassVar[str] = "1h"
+    risk_defaults: ClassVar[dict] = {}
+
+    def hbars(self, hours: float) -> int:
+        """Hours -> bars for this interval."""
+        return max(1, int(round(hours * self.bpd / 24)))
+
     def bars(self, days: float) -> int:
         return max(2, int(round(days * self.bpd)))
 
@@ -298,12 +307,155 @@ class Ensemble(Strategy):
         return {s.name: round(float(s.target(df).iloc[-1]), 3) for s in self._members()}
 
 
-STRATEGIES: dict[str, type[Strategy]] = {
-    s.name: s for s in (TrendVol, Donchian, EMACross, MACDTrend, RSIDip, BollingerRevert, Ensemble)
+# ── Intraday: 30 minute – 3 hour holding horizon ──────────────────
+#
+# These run on 15m candles and decide on every closed bar. Exits come from the
+# strategy signal, a bar-ATR stop, a take-profit, and a hard 3h time exit (see
+# INTRADAY_RISK). Only realistic on tight-spread markets (USDT pairs) with low fees.
+
+INTRADAY_RISK = {
+    "stop_atr_source": "bar", "stop_atr_mult": 2.0, "take_profit_atr_mult": 3.0,
+    "min_hold_hours": 0.5, "max_hold_hours": 3.0, "cooldown_hours": 1.0,
+    "trailing_stop": False, "risk_per_trade_pct": 1.0, "max_position_pct": 100.0,
+    "rebalance_threshold": 0.5,
 }
 
 
-def get_strategy(name: str, interval: str = "1h", **params) -> Strategy:
+@dataclass
+class IntradayStrategy(Strategy):
+    kind: ClassVar[str] = "intraday"
+    default_interval: ClassVar[str] = "15m"
+    risk_defaults: ClassVar[dict] = INTRADAY_RISK
+    interval: str = "15m"
+    daily_signals: bool = False
+    trend_hours: float = 24  # only trade long when price is above this EMA
+
+
+@dataclass
+class Breakout(IntradayStrategy):
+    """Range breakout with volume confirmation, in the direction of the 1-day trend."""
+
+    name: ClassVar[str] = "breakout"
+    description: ClassVar[str] = "Close above the last N hours' high on above-average volume"
+    range_hours: float = 4
+    vol_mult: float = 1.5
+    exit_ema_hours: float = 1
+
+    def _target(self, df):
+        c, v = df["close"], df["volume"]
+        hi, _ = ind.donchian(df, self.hbars(self.range_hours))
+        vol_ok = v > self.vol_mult * v.rolling(self.hbars(24)).mean().shift(1)
+        trend = c > ind.ema(c, self.hbars(self.trend_hours))
+        exit_ = c < ind.ema(c, self.hbars(self.exit_ema_hours) + 1)
+        return _latch((c > hi) & vol_ok & trend, exit_)
+
+    def snapshot(self, df):
+        hi, _ = ind.donchian(df, self.hbars(self.range_hours))
+        v = df["volume"]
+        return {"range_high": float(hi.iloc[-1]),
+                "volume_vs_avg": float(v.iloc[-1] / v.rolling(self.hbars(24)).mean().iloc[-2])}
+
+    @classmethod
+    def param_grid(cls):
+        return {"range_hours": [2, 4, 8], "vol_mult": [1.2, 2.0]}
+
+
+@dataclass
+class RSI2Revert(IntradayStrategy):
+    """Short-term pullback: buy a deeply oversold 2-bar RSI inside an uptrend, exit on the bounce."""
+
+    name: ClassVar[str] = "rsi2"
+    description: ClassVar[str] = "Buy RSI(2) < entry in an uptrend, exit when RSI(2) > exit"
+    entry_rsi: float = 10
+    exit_rsi: float = 70
+
+    def _target(self, df):
+        c = df["close"]
+        r = ind.rsi(c, 2)
+        trend = c > ind.ema(c, self.hbars(self.trend_hours))
+        return _latch((r < self.entry_rsi) & trend, r > self.exit_rsi)
+
+    def snapshot(self, df):
+        return {"rsi2": float(ind.rsi(df["close"], 2).iloc[-1])}
+
+    @classmethod
+    def param_grid(cls):
+        return {"entry_rsi": [5, 10, 20], "exit_rsi": [60, 80]}
+
+
+@dataclass
+class VWAPRevert(IntradayStrategy):
+    """Buy a stretch below the rolling VWAP, exit back at VWAP."""
+
+    name: ClassVar[str] = "vwap_revert"
+    description: ClassVar[str] = "Buy when price is k std-devs below the rolling VWAP, exit at VWAP"
+    vwap_hours: float = 24
+    k: float = 2.0
+
+    def _bands(self, df):
+        n = self.hbars(self.vwap_hours)
+        vw = ind.vwap_rolling(df, n)
+        dev = (df["close"] - vw).rolling(n).std()
+        return vw, dev
+
+    def _target(self, df):
+        c = df["close"]
+        vw, dev = self._bands(df)
+        trend = c > ind.ema(c, self.hbars(self.trend_hours * 3))
+        return _latch((c < vw - self.k * dev) & trend, c > vw)
+
+    def snapshot(self, df):
+        vw, dev = self._bands(df)
+        return {"vwap": float(vw.iloc[-1]), "z": float((df["close"].iloc[-1] - vw.iloc[-1]) / dev.iloc[-1])}
+
+    @classmethod
+    def param_grid(cls):
+        return {"k": [1.5, 2.0, 2.5], "vwap_hours": [12, 24]}
+
+
+@dataclass
+class Squeeze(IntradayStrategy):
+    """Volatility squeeze: after Bollinger bands are unusually narrow, buy the upside break."""
+
+    name: ClassVar[str] = "squeeze"
+    description: ClassVar[str] = "Buy a close above the upper band after a low-volatility squeeze"
+    bb_bars: int = 20
+    squeeze_pct: float = 0.2   # bandwidth in the lowest 20% of the last N days
+    lookback_days: float = 5
+
+    def _target(self, df):
+        c = df["close"]
+        up, mid, lo = ind.bollinger(c, self.bb_bars, 2.0)
+        width = (up - lo) / mid
+        thresh = width.rolling(self.bars(self.lookback_days)).quantile(self.squeeze_pct)
+        was_tight = (width <= thresh).rolling(self.hbars(2)).max().shift(1).astype(bool)
+        trend = c > ind.ema(c, self.hbars(self.trend_hours))
+        return _latch((c > up) & was_tight & trend, c < mid)
+
+    def snapshot(self, df):
+        up, mid, lo = ind.bollinger(df["close"], self.bb_bars, 2.0)
+        return {"upper": float(up.iloc[-1]), "bandwidth_pct": float(((up - lo) / mid).iloc[-1] * 100)}
+
+    @classmethod
+    def param_grid(cls):
+        return {"squeeze_pct": [0.1, 0.2, 0.3], "bb_bars": [20, 40]}
+
+
+STRATEGIES: dict[str, type[Strategy]] = {
+    s.name: s for s in (TrendVol, Donchian, EMACross, MACDTrend, RSIDip, BollingerRevert, Ensemble,
+                        Breakout, RSI2Revert, VWAPRevert, Squeeze)
+}
+
+
+def get_strategy(name: str, interval: str | None = None, **params) -> Strategy:
     if name not in STRATEGIES:
         raise ValueError(f"Unknown strategy '{name}'. Available: {', '.join(STRATEGIES)}")
-    return STRATEGIES[name](interval=interval, **params)
+    cls = STRATEGIES[name]
+    return cls(interval=interval or cls.default_interval, **params)
+
+
+def apply_risk_defaults(strategy: Strategy, risk_cfg, explicit: set[str] = frozenset()) -> None:
+    """Apply a strategy's horizon/risk profile to `risk_cfg`, except fields set explicitly."""
+    for k, v in strategy.risk_defaults.items():
+        if k not in explicit:
+            setattr(risk_cfg, k, v)

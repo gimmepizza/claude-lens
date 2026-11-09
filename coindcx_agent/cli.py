@@ -16,7 +16,7 @@ from .backtest import backtest_strategy, walk_forward
 from .config import AgentConfig
 from .data import CandleStore
 from .exchange import CoinDCXClient
-from .strategies import STRATEGIES, get_strategy
+from .strategies import STRATEGIES, apply_risk_defaults, get_strategy
 
 log = logging.getLogger("coindcx_agent")
 
@@ -32,20 +32,40 @@ def _num(x, nd=2):
     return f"{x:,.{nd}f}" if isinstance(x, (int, float)) else str(x)
 
 
-def build_config(a) -> AgentConfig:
+# risk field -> (CLI flag attr, env var). A value set either way beats a strategy's defaults.
+RISK_OVERRIDES = {
+    "stop_atr_mult": ("stop", "STOP_ATR_MULT"), "max_position_pct": ("max_position", "MAX_POSITION_PCT"),
+    "risk_per_trade_pct": ("risk_per_trade", "RISK_PER_TRADE_PCT"), "max_drawdown_pct": ("max_dd", "MAX_DRAWDOWN_PCT"),
+    "take_profit_atr_mult": ("take_profit", "TAKE_PROFIT_ATR_MULT"), "min_hold_hours": ("min_hold", "MIN_HOLD_HOURS"),
+    "max_hold_hours": ("max_hold", "MAX_HOLD_HOURS"), "stop_atr_source": ("stop_source", "STOP_ATR_SOURCE"),
+    "max_order_value": ("max_order_value", "MAX_ORDER_VALUE"),
+}
+
+
+def build_config(a, strategy_name: str | None = None) -> AgentConfig:
     cfg = AgentConfig()
     t, r, c = cfg.trading, cfg.risk, cfg.costs
     t.market = getattr(a, "market", None) or t.market
-    t.strategy = getattr(a, "strategy", None) or t.strategy
-    t.interval = getattr(a, "interval", None) or t.interval
+    t.strategy = strategy_name or getattr(a, "strategy", None) or t.strategy
+    cls = STRATEGIES.get(t.strategy)
+    t.interval = getattr(a, "interval", None) or t.interval or (cls.default_interval if cls else "1h")
+    explicit = set()
+    for field, (attr, env) in RISK_OVERRIDES.items():
+        v = getattr(a, attr, None)
+        if v is not None:
+            setattr(r, field, v)
+        if v is not None or os.getenv(env):
+            explicit.add(field)
+    if cls:
+        apply_risk_defaults(cls(interval=t.interval), r, explicit)
     for attr, obj, field in [("fee", c, "fee_pct"), ("spread", c, "spread_pct"), ("slippage", c, "slippage_pct"),
-                             ("stop", r, "stop_atr_mult"), ("max_position", r, "max_position_pct"),
-                             ("risk_per_trade", r, "risk_per_trade_pct"), ("max_dd", r, "max_drawdown_pct"),
-                             ("capital_limit", t, "capital_limit"), ("max_order_value", r, "max_order_value"),
+                             ("maker_fee", c, "maker_fee_pct"), ("capital_limit", t, "capital_limit"),
                              ("poll", t, "poll_s"), ("state_db", t, "state_db")]:
         v = getattr(a, attr, None)
         if v is not None:
             setattr(obj, field, v)
+    if getattr(a, "maker", False):
+        c.maker_entries = True
     return cfg
 
 
@@ -140,7 +160,8 @@ def _print_metrics(m, title):
         ["Round trips", m["trades"], 1],
         ["Win rate", _pct(m["win_rate"]), ""],
         ["Profit factor", _num(m["profit_factor"]), ""],
-        ["Stops hit", m["stops_hit"], ""],
+        ["Avg trade / avg hold", f"{m['avg_trade_ret']:+.2%} / {m['avg_hold_hours']:.1f}h", ""],
+        ["Exits", ", ".join(f"{k} {v}" for k, v in m["exit_reasons"].items()), ""],
         ["Fees + GST paid", _num(m["fees"]), ""],
         ["TDS withheld (creditable)", _num(m["tds_withheld"]), ""],
         ["Est. tax on gains", _num(m["est_tax"]), ""],
@@ -177,27 +198,32 @@ def cmd_backtest(a, cfg, client):
 
 def cmd_compare(a, cfg, client):
     rules = client.rules(cfg.trading.market)
-    costs = _costs_for(cfg, rules, a)
+    intraday = cfg.trading.interval in ("1m", "15m")
+    names = [n for n, c in STRATEGIES.items() if (c.kind == "intraday") == intraday]
     df = _history(client, cfg, rules, a.days)
     rows, m = [], {}
-    for name in STRATEGIES:
+    for name in names:
+        scfg = build_config(a, strategy_name=name)  # each strategy with its own horizon profile
+        costs = _costs_for(scfg, rules, a)
         s = get_strategy(name, cfg.trading.interval)
-        res = backtest_strategy(s, df, costs, cfg.risk, **_bt_kwargs(rules))
+        res = backtest_strategy(s, df, costs, scfg.risk, **_bt_kwargs(rules))
         m = res.metrics
         row = [name, _pct(m["total_return"]), _pct(m["after_tax_return"]), _num(m["sharpe"]),
-               _pct(m["max_drawdown"]), m["trades"], _pct(m["exposure"]),
+               _pct(m["max_drawdown"]), m["trades"], f"{m['avg_trade_ret']:+.2%}", f"{m['avg_hold_hours']:.1f}h",
                res.halted.split(" at ")[-1][:10] if res.halted else ""]
         if a.walk_forward and STRATEGIES[name].param_grid():
-            w = walk_forward(s, df, costs, cfg.risk, a.train_days, a.test_days, **_bt_kwargs(rules)).oos.metrics
+            w = walk_forward(s, df, costs, scfg.risk, a.train_days, a.test_days, **_bt_kwargs(rules)).oos.metrics
             row += [_pct(w["total_return"]), _num(w["sharpe"]), _pct(w["bh_total_return"])]
         rows.append(row)
     rows.append(["buy & hold", _pct(m["bh_total_return"]), "", _num(m["bh_sharpe"]),
-                 _pct(m["bh_max_drawdown"]), 1, "100%", ""])
-    headers = ["strategy", "return", "after tax", "sharpe", "max DD", "trades", "in market", "kill switch"]
+                 _pct(m["bh_max_drawdown"]), 1, "", "", ""])
+    headers = ["strategy", "return", "after tax", "sharpe", "max DD", "trades", "avg trade", "avg hold", "kill switch"]
     if a.walk_forward:
         headers += ["OOS return", "OOS sharpe", "B&H same span"]
+    costs = _costs_for(cfg, rules, a)
     print(f"\n{rules.symbol} {cfg.trading.interval} {df.index[0].date()} → {df.index[-1].date()} "
-          f"(fee {costs.fee_pct}%+GST, spread {costs.spread_pct}%)\n")
+          f"(fee {costs.fee_pct}%+GST{', maker entries ' + str(costs.maker_fee_pct) + '%' if costs.maker_entries else ''}"
+          f", spread {costs.spread_pct}%)\n")
     print(tabulate(rows, headers=headers))
     if a.walk_forward:
         print("\nOOS = walk-forward out-of-sample: parameters re-chosen on the previous "
@@ -336,10 +362,17 @@ def build_parser() -> argparse.ArgumentParser:
             sp.add_argument("--max-position", type=float, help="max %% of equity in the asset")
             sp.add_argument("--risk-per-trade", type=float, help="%% of equity lost if the stop is hit")
             sp.add_argument("--max-dd", type=float, help="kill switch drawdown %% (0 = off)")
+            sp.add_argument("--stop-source", choices=["daily", "bar"], help="ATR for stops: daily candles or trading bars")
+            sp.add_argument("--take-profit", type=float, help="take profit in ATRs (0 = off)")
+            sp.add_argument("--min-hold", type=float, help="minimum holding time in hours")
+            sp.add_argument("--max-hold", type=float, help="maximum holding time in hours (time exit; 0 = off)")
+            sp.add_argument("--max-order-value", type=float, help="cap on any single order")
         if costs:
             sp.add_argument("--fee", type=float, help="fee %% per fill before GST (default 0.5)")
             sp.add_argument("--spread", type=float, help="assumed bid/ask spread %%")
             sp.add_argument("--slippage", type=float, help="extra slippage %% per fill")
+            sp.add_argument("--maker", action="store_true", help="enter with resting limit orders at the bid")
+            sp.add_argument("--maker-fee", type=float, help="maker fee %% before GST")
 
     sp = sub.add_parser("markets", help="list markets by volume")
     sp.add_argument("--search")
@@ -379,7 +412,6 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--poll", type=int, help="seconds between checks")
         sp.add_argument("--state-db")
         sp.add_argument("--capital-limit", type=float, help="max quote currency the bot may use (live)")
-        sp.add_argument("--max-order-value", type=float)
         if name == "live":
             sp.add_argument("--yes", action="store_true", help="skip the interactive confirmation")
     sp = sub.add_parser("status", help="positions, equity, fills and events from the state DB")

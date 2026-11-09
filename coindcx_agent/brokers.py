@@ -44,7 +44,9 @@ class Broker:
     def holdings(self) -> Holdings:
         raise NotImplementedError
 
-    def buy(self, value: float, reason: str) -> Fill | None:
+    def buy(self, value: float, reason: str, maker: bool = False) -> Fill | None:
+        """Buy `value` of quote currency. maker=True rests a limit at the bid instead
+        of crossing the spread; it may not fill (returns None)."""
         raise NotImplementedError
 
     def sell(self, qty: float, reason: str) -> Fill | None:
@@ -74,11 +76,17 @@ class PaperBroker(Broker):
         bid, ask = self.client.best_bid_ask(self.rules.pair)
         return Holdings(cash=b["cash"], qty=b["qty"], bid=bid, ask=ask)
 
-    def buy(self, value, reason):
+    def buy(self, value, reason, maker=False):
         h = self.holdings()
-        fee_rate = self.cfg.costs.effective_fee
+        fee_rate = self.cfg.costs.effective_maker_fee if maker else self.cfg.costs.effective_fee
         value = min(self._cap_value(value), h.cash / (1 + fee_rate))
-        px = self.rules.round_price(h.ask * (1 + self.cfg.costs.slippage_pct / 100))
+        if maker:
+            px = self.rules.round_price(h.bid)
+            if not self._wait_for_touch(px):
+                log.info("Paper maker buy at %.4f not filled within %ss", px, self.cfg.trading.maker_wait_s)
+                return None
+        else:
+            px = self.rules.round_price(h.ask * (1 + self.cfg.costs.slippage_pct / 100))
         qty = self.rules.round_qty(value / px)
         if err := self.rules.validate(qty, px):
             log.info("Paper buy skipped: %s", err)
@@ -88,6 +96,16 @@ class PaperBroker(Broker):
         b["cash"] -= qty * px + fee
         b["qty"] += qty
         return self._record(b, "buy", qty, px, fee, 0.0, reason)
+
+    def _wait_for_touch(self, limit: float) -> bool:
+        """Simulate a resting bid: filled once the best ask trades down to it."""
+        deadline = time.time() + self.cfg.trading.maker_wait_s
+        while time.time() < deadline:
+            _, ask = self.client.best_bid_ask(self.rules.pair)
+            if ask <= limit:
+                return True
+            time.sleep(2)
+        return False
 
     def sell(self, qty, reason):
         h = self.holdings()
@@ -149,7 +167,7 @@ class LiveBroker(Broker):
             cash = max(0.0, min(quote_free, limit - qty * bid))
         return Holdings(cash=cash, qty=qty, bid=bid, ask=ask)
 
-    def _execute(self, side: str, qty: float, price: float, reason: str) -> Fill | None:
+    def _execute(self, side: str, qty: float, price: float, reason: str, wait_s: int | None = None) -> Fill | None:
         cid = f"bot-{uuid.uuid4().hex[:16]}"
         try:
             order = self.client.create_order(self.rules.symbol, side, qty, price, "limit_order", cid)
@@ -162,7 +180,7 @@ class LiveBroker(Broker):
                 self.store.event("error", f"{side} {qty} failed: {e}")
                 return None
         oid = order.get("id")
-        deadline = time.time() + self.cfg.trading.order_timeout_s
+        deadline = time.time() + (wait_s or self.cfg.trading.order_timeout_s)
         status = order
         while time.time() < deadline:
             status = self.client.order_status(order_id=oid)
@@ -193,15 +211,15 @@ class LiveBroker(Broker):
         log.info("LIVE %s %.8f %s @ %.4f (fee %.4f) — %s", side.upper(), filled, self.rules.symbol, avg, fee, reason)
         return f
 
-    def buy(self, value, reason):
+    def buy(self, value, reason, maker=False):
         h = self.holdings()
         value = min(self._cap_value(value), h.cash / (1 + self.cfg.costs.effective_fee))
-        px = self.rules.round_price(h.ask)
+        px = self.rules.round_price(h.bid if maker else h.ask)
         qty = self.rules.round_qty(value / px)
         if err := self.rules.validate(qty, px):
             log.info("Live buy skipped: %s", err)
             return None
-        return self._execute("buy", qty, px, reason)
+        return self._execute("buy", qty, px, reason, self.cfg.trading.maker_wait_s if maker else None)
 
     def sell(self, qty, reason):
         h = self.holdings()

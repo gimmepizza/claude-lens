@@ -51,6 +51,40 @@ Run `compare --walk-forward` yourself; results move as new data arrives.
   no loss set-off, while buy & hold is only taxed when sold. Compare the
   "after tax" column, not just "return".
 
+## Intraday: 30 minute – 3 hour trades
+
+`breakout`, `rsi2`, `vwap_revert` and `squeeze` run on 15m candles with a fixed horizon:
+
+- **Min hold 30 min:** the strategy can't exit sooner (stops still fire).
+- **Max hold 3 h:** a time exit; after it, the signal must reset before re-entering.
+- **Stop 2× / take-profit 3× the 15m ATR**, 1 h cooldown after a stop.
+- **Optional maker entries** (`--maker`): rest a bid instead of crossing the spread. In the
+  backtest it only fills if price trades *through* the bid; misses are counted.
+
+Override any of these with `--min-hold`, `--max-hold`, `--stop`, `--take-profit`,
+`--stop-source`, or the matching `.env` values.
+
+```bash
+python -m coindcx_agent compare -m BTCUSDT -i 15m --fee 0.1 --maker --maker-fee 0
+python -m coindcx_agent backtest -m BTCUSDT -s rsi2 --report rsi2.html
+python -m coindcx_agent paper -m BTCUSDT -s breakout
+```
+
+**Backtest verdict (Nov 2024 – Nov 2026, BTC/ETH/SOL USDT and BTCINR): none of them
+make money.** Even with zero costs, the average trade earns between −0.05% and +0.03%.
+That's no edge. The cheapest realistic round trip (0.1% taker, 0% maker, plus GST and
+slippage) costs ~0.12–0.15%. Every strategy loses 50–90% over two years. A daily-trend
+filter doesn't fix it.
+
+Two more things matter at this horizon:
+- **Use USDT markets, not INR.** INR spreads are 0.5–0.7%, about the size of a typical 3h
+  move. BTCUSDT and ETHUSDT spreads are about 0%.
+- **Indian tax makes frequent trading worse.** Each winning trade is taxed with no loss
+  set-off, so the estimated tax can exceed what's left of your capital ("after tax" below −100%).
+
+Treat these as a research harness. Don't take them live unless you find an idea that
+survives `compare --walk-forward` after costs.
+
 ## How it works
 
 | Module | Job |
@@ -59,7 +93,7 @@ Run `compare --walk-forward` yourself; results move as new data arrives.
 | `data.py` | Paginated candle history with a CSV cache; drops the still-forming candle. |
 | `indicators.py` | EMA, RSI, ATR, Bollinger, MACD, Donchian, ADX, realized vol, daily ATR. |
 | `strategies.py` | Each strategy returns a target exposure in [0, 1] for every bar. |
-| `risk.py` | Sizing, optional ATR trailing stop, cooldown, daily loss limit, drawdown kill switch. Shared by backtest and live. |
+| `risk.py` | Sizing, ATR stop (daily or bar), take-profit, min/max holding time, cooldown, daily loss limit, drawdown kill switch. Shared by backtest and live. |
 | `backtest.py` | Bar-by-bar simulator + walk-forward optimiser. |
 | `brokers.py` | `PaperBroker` (fills at live bid/ask + slippage + fees) and `LiveBroker`. |
 | `engine.py` | The trading loop. |
@@ -95,6 +129,10 @@ Run `compare --walk-forward` yourself; results move as new data arrives.
 | Name | Type | Idea |
 |---|---|---|
 | `ensemble` (default) | trend | Average of `trend_vol`, `donchian`, `ema_cross` |
+| `breakout` | intraday | Close above the last 4h high on 1.5× volume, in a 1-day uptrend |
+| `rsi2` | intraday | Buy RSI(2) < 10 in an uptrend, exit when RSI(2) > 70 |
+| `vwap_revert` | intraday | Buy 2 std-devs below the 24h rolling VWAP, exit at VWAP |
+| `squeeze` | intraday | Buy the upside break after a Bollinger-band squeeze |
 | `ema_cross` | trend | Fast EMA above slow EMA, with ADX trend-strength filter |
 | `donchian` | trend | Buy an N-day high breakout, exit at an M-day low |
 | `trend_vol` | trend | Multi-horizon momentum, volatility-targeted size, stepped exposure |

@@ -100,12 +100,14 @@ def run_backtest(
     df = df.loc[target.index.intersection(df.index)]
     target = target.reindex(df.index).fillna(0.0)
     o, h, l, c = (df[k].to_numpy(float) for k in ("open", "high", "low", "close"))
-    a = ind.daily_atr(df, risk_cfg.atr_days).to_numpy(float)
+    a = (ind.atr(df, risk_cfg.atr_bars) if risk_cfg.stop_atr_source == "bar"
+         else ind.daily_atr(df, risk_cfg.atr_days)).to_numpy(float)
     tgt = target.to_numpy(float)
     idx = df.index
     n = len(df)
 
     fee_rate = costs.effective_fee
+    maker_fee = costs.effective_maker_fee
     impact = costs.spread_pct / 200 + costs.slippage_pct / 100  # half spread + slippage
     tds_rate = costs.tds_pct / 100 if inr_market else 0.0
     tax_rate = costs.tax_rate_pct / 100
@@ -116,16 +118,20 @@ def run_backtest(
     trades: list[Trade] = []
     open_trade: Trade | None = None
     pending: float | None = None  # desired equity fraction, decided at previous close
+    pending_reason = "signal"
+    maker_limit = 0.0             # resting maker buy price for this bar (0 = none)
+    missed_entries = 0
     equity = np.empty(n)
     expo = np.empty(n)
 
-    def buy(value: float, px_mid: float, t: pd.Timestamp):
+    def buy(value: float, px_mid: float, t: pd.Timestamp, maker: bool = False):
         nonlocal cash, qty, avg_cost, fees, open_trade
-        px = px_mid * (1 + impact)
-        fee = value * fee_rate
+        px = px_mid if maker else px_mid * (1 + impact)
+        rate = maker_fee if maker else fee_rate
+        fee = value * rate
         if value + fee > cash:
-            value = cash / (1 + fee_rate)
-            fee = value * fee_rate
+            value = cash / (1 + rate)
+            fee = value * rate
         if value <= 0 or value < min_notional:
             return
         q = value / px
@@ -138,14 +144,14 @@ def run_backtest(
         open_trade.cost += value + fee
         open_trade.qty_max = max(open_trade.qty_max, qty)
 
-    def sell(q: float, px_mid: float, t: pd.Timestamp, reason: str):
+    def sell(q: float, px_mid: float, t: pd.Timestamp, reason: str, maker: bool = False):
         nonlocal cash, qty, fees, tds, taxable_gains, open_trade, avg_cost
         q = min(q, qty)
-        px = px_mid * (1 - impact)
+        px = px_mid if maker else px_mid * (1 - impact)
         value = q * px
         if q <= 0 or (value < min_notional and q < qty):
             return
-        fee = value * fee_rate
+        fee = value * (maker_fee if maker else fee_rate)
         cash += value - fee
         fees += fee
         tds += value * tds_rate
@@ -162,27 +168,44 @@ def run_backtest(
 
     for i in range(n):
         t = idx[i]
-        # 1) fill the order decided at the previous close, at this bar's open
+        prev_atr = a[i - 1] if i > 0 and not np.isnan(a[i - 1]) else 0.0
+        # 1) fill the order decided at the previous close
         if pending is not None:
             eq_open = cash + qty * o[i]
             cur_val = qty * o[i]
             want_val = pending * eq_open
             was_flat = qty <= 0
             if pending <= 1e-9 and qty > 0:
-                sell(qty, o[i], t, "kill_switch" if rm.s.halted else "signal")
-                rm.on_exit(stopped=False)
+                reason = "kill_switch" if rm.s.halted else pending_reason
+                sell(qty, o[i], t, reason)
+                rm.on_exit(reason=reason)
             elif want_val > cur_val:
-                buy(want_val - cur_val, o[i], t)
+                if was_flat and maker_limit > 0:
+                    # resting bid: fills only if the market trades through it this bar
+                    if l[i] < maker_limit:
+                        buy(want_val - cur_val, min(o[i], maker_limit), t, maker=True)
+                    else:
+                        missed_entries += 1
+                else:
+                    buy(want_val - cur_val, o[i], t)
                 if was_flat and qty > 0:
-                    rm.on_entry(o[i] * (1 + impact), a[i - 1] if i > 0 and not np.isnan(a[i - 1]) else 0.0)
+                    entry_px = open_trade.entry_price if open_trade else o[i]
+                    rm.on_entry(entry_px, prev_atr)
             elif want_val < cur_val and qty > 0:
                 sell((cur_val - want_val) / o[i], o[i], t, "rebalance")
-            pending = None
+            pending, pending_reason, maker_limit = None, "signal", 0.0
 
-        # 2) protective stop, intrabar
+        # 2) protective stop, then take-profit, intrabar (stop first: conservative)
         if qty > 0 and rm.stop_triggered(l[i]):
             sell(qty, min(o[i], rm.s.stop_price), t, "stop")
-            rm.on_exit(stopped=True)
+            rm.on_exit(reason="stop")
+        elif qty > 0 and rm.take_profit_triggered(h[i]):
+            tp = rm.s.take_profit
+            if costs.maker_entries:  # resting limit sell at the TP price
+                sell(qty, max(o[i], tp), t, "take_profit", maker=True)
+            else:
+                sell(qty, max(o[i], tp), t, "take_profit")
+            rm.on_exit(reason="take_profit")
 
         # 3) bar close bookkeeping
         eq = cash + qty * c[i]
@@ -194,11 +217,18 @@ def run_backtest(
         rm.tick()
 
         # 4) decide next bar's position
+        if i == n - 1:
+            break
+        if qty > 0 and rm.time_exit_due():
+            pending, pending_reason = 0.0, "time"
+            continue
         atr_ok = not np.isnan(a[i])
-        if i < n - 1 and (atr_ok or not rm.uses_stop):
+        if atr_ok or not rm.uses_stop:
             want = rm.desired_fraction(tgt[i], c[i], a[i] if atr_ok else 0.0, expo[i])
             if abs(want - expo[i]) > 1e-6:
                 pending = want
+                if costs.maker_entries and expo[i] <= 1e-9 and want > 0:
+                    maker_limit = c[i]  # join the bid at the signal bar's close
 
     # Close any open trade on paper so trade stats are complete (equity already marks it).
     if open_trade is not None:
@@ -226,6 +256,10 @@ def run_backtest(
         "profit_factor": sum(wins) / abs(sum(losses)) if losses and sum(losses) != 0 else float("inf") if wins else 0.0,
         "avg_trade_ret": float(np.mean([t.ret for t in closed])) if closed else 0.0,
         "stops_hit": sum(1 for t in trades if t.exit_reason == "stop"),
+        "exit_reasons": dict(pd.Series([t.exit_reason for t in trades]).value_counts()) if trades else {},
+        "avg_hold_hours": float(np.mean([(t.exit_time - t.entry_time).total_seconds() / 3600
+                                         for t in closed])) if closed else 0.0,
+        "missed_maker_entries": missed_entries,
         "exposure": float(np.mean(expo)),
         "fees": fees,
         "fees_pct_of_start": fees / starting_cash,

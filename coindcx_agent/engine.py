@@ -51,7 +51,9 @@ class Engine:
         if len(df) < 60:
             raise RuntimeError(f"only {len(df)} candles available for {self.rules.pair}")
         target = float(self.strategy.target(df).iloc[-1])
-        if self.signal_interval == "1d":
+        if self.cfg.risk.stop_atr_source == "bar":
+            atr = float(ind.atr(df, self.cfg.risk.atr_bars).iloc[-1])
+        elif self.signal_interval == "1d":
             atr = float(ind.atr(df, self.cfg.risk.atr_days).iloc[-1])
         else:
             atr = float(ind.daily_atr(df, self.cfg.risk.atr_days).iloc[-1])
@@ -62,11 +64,12 @@ class Engine:
     def _save(self):
         self.store.set(self.key, self.rm.s.to_dict())
 
-    def _flatten(self, reason: str, stopped: bool = False):
+    def _flatten(self, reason: str):
         h = self.broker.holdings()
         if h.qty > 0 and self.broker.sell(h.qty, reason):
-            self.rm.on_exit(stopped=stopped)
-            self.store.event("warn", f"flattened: {reason}")
+            self.rm.on_exit(reason=reason)
+            self.store.event("info" if reason in ("time", "take_profit", "signal") else "warn",
+                             f"exit: {reason}")
 
     def kill_file(self) -> bool:
         return Path(self.cfg.trading.kill_switch_file).exists()
@@ -86,7 +89,11 @@ class Engine:
 
         if h.qty > 0 and self.rm.stop_triggered(h.bid):
             log.warning("Stop hit at %.4f (stop %.4f)", h.bid, self.rm.s.stop_price)
-            self._flatten("stop", stopped=True)
+            self._flatten("stop")
+            h = self.broker.holdings()
+        elif h.qty > 0 and self.rm.take_profit_triggered(h.bid):
+            log.info("Take-profit hit at %.4f (target %.4f)", h.bid, self.rm.s.take_profit)
+            self._flatten("take_profit")
             h = self.broker.holdings()
 
         decided_bar = self.store.get(f"{self.key}:last_bar")
@@ -112,17 +119,22 @@ class Engine:
         if h.qty > 0:
             rm.on_bar(sig["high"], sig["atr"])
         rm.tick()
+        if h.qty > 0 and rm.time_exit_due():
+            log.info("Max holding time reached (%d bars): exiting", rm.s.bars_held)
+            self._flatten("time")
+            return
         want = rm.desired_fraction(sig["target"], h.bid, sig["atr"], h.exposure)
         cur_val, want_val = h.qty * h.bid, want * h.equity
         log.info("Signal bar %s: target=%.2f -> hold %.0f%% of equity (now %.0f%%)",
                  sig["bar"], sig["target"], want * 100, h.exposure * 100)
         if want <= 1e-9 and h.qty > 0:
-            if self.broker.sell(h.qty, "signal"):
-                rm.on_exit(stopped=False)
+            self._flatten("signal")
         elif want_val > cur_val + 1e-9:
             was_flat = h.qty <= 0
-            if self.broker.buy(want_val - cur_val, "signal") and was_flat:
-                rm.on_entry(self.broker.holdings().ask, sig["atr"])
+            maker = self.cfg.costs.maker_entries and was_flat
+            fill = self.broker.buy(want_val - cur_val, "signal", maker=maker)
+            if fill and was_flat:
+                rm.on_entry(fill.price, sig["atr"])
         elif want_val < cur_val - 1e-9 and h.qty > 0:
             self.broker.sell((cur_val - want_val) / h.bid, "rebalance")
 
